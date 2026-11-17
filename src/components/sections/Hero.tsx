@@ -49,7 +49,7 @@ export function Hero() {
 
       <div className="container-ems flex flex-1 flex-col justify-center pb-10 pt-32 lg:pb-12">
         <div className="max-w-[44rem]">
-          <p className="eyebrow hero-in text-orange" style={{ animationDelay: "80ms" }}>
+          <p data-header-trigger className="eyebrow hero-in text-orange" style={{ animationDelay: "80ms" }}>
             {site.eyebrow}
           </p>
           <h1 id="hero-title" className="hero-in mt-6 text-[2.6rem] font-extrabold leading-[1.04] text-white sm:text-6xl lg:text-[4.6rem]" style={{ animationDelay: "180ms" }}>

@@ -19,11 +19,21 @@ export function Header() {
   const panelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24);
+    // Na home, só fica branco quando o texto da hero encosta no cabeçalho
+    // (antes disso nada passa por baixo dele, então segue transparente).
+    const onScroll = () => {
+      const trigger = document.querySelector<HTMLElement>("[data-header-trigger]");
+      const headerH = document.querySelector("header")?.getBoundingClientRect().height ?? 80;
+      setScrolled(trigger ? trigger.getBoundingClientRect().top < headerH : window.scrollY > 24);
+    };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+    window.addEventListener("resize", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+    };
+  }, [pathname]);
 
   // fecha o menu ao navegar
   useEffect(() => setOpen(false), [pathname]);
