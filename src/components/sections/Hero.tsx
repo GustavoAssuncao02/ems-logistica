@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { HeroRoad } from "@/components/road/HeroRoad";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { site } from "@/config/site";
 
@@ -10,6 +11,9 @@ import { site } from "@/config/site";
  * Configure em src/config/site.ts → hero.video (mp4/webm + poster) ou
  * hero.image. Enquanto nada for fornecido, exibe uma composição provisória
  * identificada como placeholder — sem simular um vídeo ou foto.
+ *
+ * Na base, uma faixa decorativa (sem textos) com a carreta EMS rodando numa
+ * estrada sem fim, com paradas sorteadas: pedágio, posto e semáforo.
  */
 export function Hero() {
   const { video, image } = site.hero;
@@ -43,7 +47,7 @@ export function Hero() {
         <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-navy-950/70 to-transparent" />
       </div>
 
-      <div className="container-ems flex flex-1 flex-col justify-center pb-28 pt-32 lg:pb-32">
+      <div className="container-ems flex flex-1 flex-col justify-center pb-10 pt-32 lg:pb-12">
         <div className="max-w-[44rem]">
           <p className="eyebrow hero-in text-orange" style={{ animationDelay: "80ms" }}>
             {site.eyebrow}
@@ -66,22 +70,17 @@ export function Hero() {
         </div>
       </div>
 
-      <a
-        href="#operacao"
-        className="group absolute bottom-8 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.24em] text-white/60 transition hover:text-white sm:flex"
-      >
-        Explorar
-        <span className="relative block h-10 w-px overflow-hidden bg-white/25" aria-hidden="true">
-          <span className="scroll-cue absolute inset-x-0 top-0 h-4 bg-orange" />
-        </span>
-      </a>
+      {/* faixa animada: carreta EMS na estrada */}
+      <div className="relative h-[clamp(150px,27svh,270px)] w-full shrink-0">
+        <HeroRoad className="absolute inset-0" />
 
-      {!hasMedia && site.showPendingMediaBadges && (
-        <p className="absolute bottom-5 right-5 max-w-[16rem] rounded-xl bg-black/35 px-3.5 py-2.5 text-[11px] leading-snug text-white/75 ring-1 ring-white/15 backdrop-blur-sm sm:bottom-8 sm:right-8 sm:max-w-xs">
-          <strong className="font-semibold text-white">Mídia fotorealista pendente.</strong> Composição provisória — aguardando vídeo/foto do
-          caminhão EMS ao pôr do sol.
-        </p>
-      )}
+        {!hasMedia && site.showPendingMediaBadges && (
+          <p className="absolute bottom-full right-8 mb-4 hidden max-w-xs rounded-xl bg-black/35 px-3.5 py-2.5 text-[11px] leading-snug text-white/75 ring-1 ring-white/15 backdrop-blur-sm lg:block">
+            <strong className="font-semibold text-white">Mídia fotorealista pendente.</strong> Composição provisória — aguardando vídeo/foto do
+            caminhão EMS ao pôr do sol.
+          </p>
+        )}
+      </div>
     </section>
   );
 }

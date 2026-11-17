@@ -175,9 +175,14 @@ export function FormFeedback({ state, whatsappText }: { state: SubmitState; what
               Enviar pelo WhatsApp
             </a>
           )}
-          <a href={site.contact.instagram} target="_blank" rel="noopener noreferrer" className="rounded-full px-4 py-2 font-semibold text-navy ring-1 ring-navy/25">
-            Falar pelo Instagram
-          </a>
+          {site.contact.instagram && (
+            <a href={site.contact.instagram} target="_blank" rel="noopener noreferrer" className="rounded-full px-4 py-2 font-semibold text-navy ring-1 ring-navy/25">
+              Falar pelo Instagram
+            </a>
+          )}
+          <Link href="/contato" className="rounded-full px-4 py-2 font-semibold text-navy ring-1 ring-navy/25">
+            Outros canais de contato
+          </Link>
         </div>
       </div>
     );

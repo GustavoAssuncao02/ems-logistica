@@ -1,9 +1,7 @@
 import { About } from "@/components/sections/About";
 import { CareersTeaser } from "@/components/sections/CareersTeaser";
-import { Complementary } from "@/components/sections/Complementary";
 import { Hero } from "@/components/sections/Hero";
 import { Intro } from "@/components/sections/Intro";
-import { JourneySection } from "@/components/sections/JourneySection";
 import { Process } from "@/components/sections/Process";
 import { QuoteSection } from "@/components/sections/QuoteSection";
 import { Solutions } from "@/components/sections/Solutions";
@@ -17,7 +15,7 @@ export default function HomePage() {
     url: site.url,
     description: site.description,
     logo: `${site.url}/brand/ems-monogram.svg`,
-    sameAs: [site.contact.instagram],
+    ...(site.contact.instagram ? { sameAs: [site.contact.instagram] } : {}),
     slogan: site.tagline,
   };
 
@@ -26,9 +24,7 @@ export default function HomePage() {
       <Hero />
       <Intro />
       <Solutions />
-      <JourneySection />
       <About />
-      <Complementary />
       <Process />
       <QuoteSection />
       <CareersTeaser />

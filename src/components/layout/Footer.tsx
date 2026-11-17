@@ -6,7 +6,6 @@ const solutions = [
   { href: "/#solucoes", label: "Logística" },
   { href: "/#solucoes", label: "Gestão de fretes" },
   { href: "/#solucoes", label: "Transporte rodoviário de cargas" },
-  { href: "/#complementares", label: "Soluções empresariais" },
 ];
 
 export function Footer() {
@@ -72,12 +71,14 @@ export function Footer() {
                 </a>
               </li>
             )}
+            {contact.instagram && (
             <li>
               <a href={contact.instagram} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-white/80 transition hover:text-white">
                 <InstagramIcon />
                 {contact.instagramHandle}
               </a>
             </li>
+            )}
             <li>
               <Link href="/contato" className="text-white/80 transition hover:text-white">
                 Formulário de contato

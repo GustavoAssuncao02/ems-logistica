@@ -37,6 +37,7 @@ export function QuoteSection({ headingLevel = "h2" }: { headingLevel?: "h1" | "h
                   Prefere o WhatsApp? {site.contact.whatsappDisplay}
                 </a>
               )}
+              {site.contact.instagram && (
               <a
                 href={site.contact.instagram}
                 target="_blank"
@@ -46,6 +47,7 @@ export function QuoteSection({ headingLevel = "h2" }: { headingLevel?: "h1" | "h
                 <InstagramIcon />
                 {site.contact.instagramHandle}
               </a>
+              )}
             </div>
           </div>
         </Reveal>

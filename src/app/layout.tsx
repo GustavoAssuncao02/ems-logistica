@@ -50,10 +50,27 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
+/**
+ * Executado antes da renderização: num recarregamento (F5), remove a âncora
+ * da URL e desliga a restauração de rolagem só para esse carregamento, para a
+ * página abrir no topo. Navegação normal e voltar/avançar não são afetados.
+ */
+const RELOAD_TO_TOP = `(function(){try{
+var n=performance.getEntriesByType("navigation")[0];
+if(!n||n.type!=="reload")return;
+var h=window.history;
+if(location.hash)h.replaceState(h.state,"",location.pathname+location.search);
+if("scrollRestoration" in h)h.scrollRestoration="manual";
+window.scrollTo(0,0);
+window.addEventListener("load",function(){window.scrollTo(0,0);setTimeout(function(){window.scrollTo(0,0);if("scrollRestoration" in h)h.scrollRestoration="auto";},50);});
+}catch(e){}})();`;
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="pt-BR" className={`${manrope.variable} ${inter.variable}`}>
       <body>
+        {/* recarregar a página sempre volta ao topo, sem a âncora na URL (ex.: /#solucoes → /) */}
+        <script dangerouslySetInnerHTML={{ __html: RELOAD_TO_TOP }} />
         <a
           href="#conteudo"
           className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-lg focus:bg-white focus:px-4 focus:py-2 focus:text-navy focus:shadow-lg"

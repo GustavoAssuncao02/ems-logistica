@@ -10,10 +10,25 @@ export const TILE = { clouds: 2200, far: 2400, mid: 1800 } as const;
 
 const G = GROUND_Y;
 
-export function CloudLayer() {
+/** Faixa horizontal (coordenadas de tela do SVG) que as camadas precisam cobrir. */
+export type Span = readonly [number, number];
+
+/**
+ * Deslocamentos das cópias do ladrilho. Como a camada é deslocada entre
+ * −tile e 0, cada cópia extra garante cobertura contínua da faixa pedida.
+ * Sem faixa, mantém o padrão do palco (duas cópias).
+ */
+function copies(tile: number, span?: Span) {
+  if (!span) return [0, tile];
+  const out: number[] = [];
+  for (let k = Math.floor(span[0] / tile); k * tile < span[1] + tile; k++) out.push(k * tile);
+  return out;
+}
+
+export function CloudLayer({ span }: { span?: Span }) {
   return (
     <g data-j="layer-clouds">
-      {[0, TILE.clouds].map((ox) => (
+      {copies(TILE.clouds, span).map((ox) => (
         <g key={ox} transform={`translate(${ox} 0)`} fill={MONO.bg} stroke={MONO.g3} strokeWidth={2}>
           <Cloud x={180} y={118} s={1} />
           <Cloud x={980} y={78} s={0.75} />
@@ -34,10 +49,10 @@ function Cloud({ x, y, s }: { x: number; y: number; s: number }) {
   );
 }
 
-export function FarLayer() {
+export function FarLayer({ span }: { span?: Span }) {
   return (
     <g data-j="layer-far">
-      {[0, TILE.far].map((ox) => (
+      {copies(TILE.far, span).map((ox) => (
         <g key={ox} transform={`translate(${ox} 0)`}>
           <path
             d={`M0 ${G} V440 C200 404 380 398 560 424 C720 446 880 402 1080 392 C1300 382 1420 428 1600 434 C1800 440 1960 398 2160 404 C2280 408 2340 428 2400 440 V${G} Z`}
@@ -70,10 +85,10 @@ function Turbine({ x, base, h }: { x: number; base: number; h: number }) {
   );
 }
 
-export function MidLayer() {
+export function MidLayer({ span }: { span?: Span }) {
   return (
     <g data-j="layer-mid">
-      {[0, TILE.mid].map((ox) => (
+      {copies(TILE.mid, span).map((ox) => (
         <g key={ox} transform={`translate(${ox} 0)`}>
           {/* fiação entre postes */}
           <g fill="none" stroke={MONO.g3} strokeWidth={1.2}>

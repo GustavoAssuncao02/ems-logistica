@@ -26,7 +26,7 @@ export function Road({ segments, dashes, curbs }: RoadProps) {
       {segments.map(([a, b]) => (
         <g key={`r${a}`}>
           <rect x={a} y={G} width={b - a} height={ROAD_H} fill={MONO.ink} />
-          <rect x={a} y={G} width={b - a} height={2} fill="#3A3A3A" />
+          <rect x={a} y={G} width={b - a} height={2} fill={MONO.edge} />
         </g>
       ))}
       {dashes.map(([a, b]) => (

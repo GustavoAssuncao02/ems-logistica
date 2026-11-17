@@ -58,7 +58,7 @@ export function Truck() {
           fontSize={11.5}
           fontWeight={700}
           letterSpacing={5}
-          fill="#A8A8A8"
+          fill={MONO.label}
         >
           LOGÍSTICA
         </text>

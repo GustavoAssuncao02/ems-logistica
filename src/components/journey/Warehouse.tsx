@@ -38,7 +38,7 @@ export function WarehouseBack({ variant, wallL, wallR, truckX }: Props) {
       {/* parede de fundo */}
       <rect x={inL} y={WAREHOUSE.roofBottom} width={inR - inL} height={G - WAREHOUSE.roofBottom} fill={MONO.wall} />
       {columns.map((c) => (
-        <rect key={c} x={c} y={WAREHOUSE.roofBottom} width={10} height={G - WAREHOUSE.roofBottom} fill="#D8D8D8" />
+        <rect key={c} x={c} y={WAREHOUSE.roofBottom} width={10} height={G - WAREHOUSE.roofBottom} fill={MONO.column} />
       ))}
       {/* tesouras do telhado */}
       <path

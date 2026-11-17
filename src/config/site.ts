@@ -34,11 +34,12 @@ export const site = {
     /** Endereço — PENDENTE. Deixe null até a confirmação. */
     address: null as string | null,
     /**
-     * Instagram de referência informado no briefing (perfil da EMS Consultoria).
-     * Troque pelo perfil da EMS Logística, se houver um próprio.
+     * Instagram oficial da EMS Logística — PENDENTE.
+     * Não use o perfil da EMS Consultoria (@emsconsultoria.adm): é outra empresa.
+     * Enquanto vazio, os links de Instagram ficam ocultos.
      */
-    instagram: "https://www.instagram.com/emsconsultoria.adm/",
-    instagramHandle: "@emsconsultoria.adm",
+    instagram: "",
+    instagramHandle: "",
   },
 
   /**
@@ -48,7 +49,10 @@ export const site = {
    */
   hero: {
     video: null as null | { mp4: string; webm?: string; poster: string },
-    image: null as null | { src: string; alt: string },
+    image: {
+      src: "/media/caminhao-ems-por-do-sol-direita-v2.png",
+      alt: "Caminhão EMS na rodovia ao pôr do sol, com montanhas e uma cidade ao fundo.",
+    } as null | { src: string; alt: string },
   },
 
   /** Exibe selos "Mídia pendente" nos espaços que aguardam fotografia oficial. */
@@ -59,8 +63,6 @@ export const nav = [
   { href: "/#inicio", label: "Início" },
   { href: "/#sobre", label: "A EMS" },
   { href: "/#solucoes", label: "Soluções" },
-  { href: "/#jornada", label: "Jornada" },
-  { href: "/#complementares", label: "Soluções empresariais" },
   { href: "/trabalhe-conosco", label: "Trabalhe conosco" },
   { href: "/contato", label: "Contato" },
 ] as const;
@@ -69,7 +71,6 @@ export const services = [
   { value: "logistica", label: "Logística e gestão operacional", transport: true },
   { value: "fretes", label: "Gestão e negociação de fretes", transport: true },
   { value: "transporte", label: "Transporte rodoviário de cargas", transport: true },
-  { value: "complementares", label: "Soluções empresariais complementares", transport: false },
   { value: "outro", label: "Outro assunto", transport: false },
 ] as const;
 
@@ -88,20 +89,6 @@ export const careerAreas = [
   "Comercial",
   "Administrativo / financeiro",
   "Outra área",
-] as const;
-
-/**
- * Soluções empresariais complementares (divulgadas nos materiais da marca).
- * VALIDAR com a empresa antes de publicar: quais são prestadas diretamente
- * e quais por meio de parceiros. `delivery`: "parceiro" | "direto".
- */
-export const complementary = [
-  { key: "seguros", label: "Seguros", text: "Orientação na escolha de seguros adequados ao perfil do negócio.", delivery: "parceiro" },
-  { key: "consorcios", label: "Consórcios", text: "Apoio na avaliação de consórcios para aquisições planejadas.", delivery: "parceiro" },
-  { key: "credito", label: "Crédito", text: "Apoio na busca de linhas de crédito compatíveis com o momento da empresa.", delivery: "parceiro" },
-  { key: "saude", label: "Planos de saúde", text: "Orientação na escolha de planos de saúde empresariais.", delivery: "parceiro" },
-  { key: "contabilidade", label: "Contabilidade", text: "Conexão com serviços contábeis para manter a gestão organizada.", delivery: "parceiro" },
-  { key: "juridico", label: "Jurídico", text: "Conexão com apoio jurídico para questões empresariais.", delivery: "parceiro" },
 ] as const;
 
 export function whatsappLink(message?: string) {

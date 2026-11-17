@@ -1,7 +1,7 @@
 import { gsap } from "gsap";
 import { ARROW_LENGTH, LOGO_WIDTH } from "@/components/brand/logoGeometry";
 import { TILE } from "./Backdrop";
-import { GROUND_Y, JOURNEY, MONO, PARALLAX, TRUCK } from "./config";
+import { GROUND_Y, JOURNEY, MONO, MONO_HEX, PARALLAX, TRUCK } from "./config";
 import { RAMP_RAISED, WAVE } from "./Ferry";
 import { PUMP } from "./FuelStation";
 import { brakingAt, groundSpeedAt, pitchAt, rearTimeAt, type JourneyPlan } from "./plan";
@@ -250,8 +250,8 @@ export function createRenderer(root: SVGSVGElement, plan: JourneyPlan, state: Jo
   const A = TRUCK.anchorX;
   const R = TRUCK.wheelR;
   const DOOR_H = G - WAREHOUSE.doorTop;
-  const INK = hexGray(MONO.ink);
-  const G4 = hexGray(MONO.g4);
+  const INK = hexGray(MONO_HEX.ink);
+  const G4 = hexGray(MONO_HEX.g4);
   const startScreen = A + plan.start.drift;
   const logoTarget = { x: startScreen + TRUCK.logo.cx, y: G + TRUCK.logo.cy, s: TRUCK.logo.width / LOGO_WIDTH };
   const logoStart = { x: 800, y: 286, s: 0.5 };

@@ -90,7 +90,7 @@ export function River({ bankLeft, bankRight }: { bankLeft: number; bankRight: nu
           <rect x={bankLeft} y={WATER_Y - 6} width={w} height={STAGE.h} />
         </clipPath>
       </defs>
-      <rect x={bankLeft} y={WATER_Y} width={w} height={STAGE.h - WATER_Y + 40} fill="#DEDEDE" />
+      <rect x={bankLeft} y={WATER_Y} width={w} height={STAGE.h - WATER_Y + 40} fill={MONO.water} />
       <g clipPath="url(#river-clip)">
         {WAVE.rows.map((y, i) => (
           <g key={y} transform={`translate(0 ${y})`}>

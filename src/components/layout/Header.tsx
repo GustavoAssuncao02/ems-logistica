@@ -69,9 +69,9 @@ export function Header() {
       {overlay && <div aria-hidden="true" className="pointer-events-none absolute inset-0 -bottom-10 bg-gradient-to-b from-navy-950/55 to-transparent" />}
       <div className="container-ems relative flex h-[4.5rem] items-center justify-between gap-6 lg:h-20">
         <Link href="/#inicio" className="flex shrink-0 items-center gap-3" aria-label={`${site.name} — página inicial`}>
-          <EmsLogo variant={overlay ? "inverse" : "color"} descriptor={false} className="h-8 w-auto lg:h-9" title="EMS" />
+          <EmsLogo variant={overlay ? "inverse" : "color"} descriptor={false} className="h-8 w-auto lg:h-9" title="EMS" build />
           <span
-            className={`hidden border-l pl-3 font-display text-[11px] font-bold tracking-[0.32em] sm:block ${
+            className={`logo-build-desc hidden border-l pl-3 font-display text-[11px] font-bold tracking-[0.32em] sm:block ${
               overlay ? "border-white/30 text-white/85" : "border-line text-slate"
             }`}
           >
@@ -151,6 +151,7 @@ export function Header() {
           >
             Solicitar cotação
           </Link>
+          {site.contact.instagram && (
           <a
             href={site.contact.instagram}
             target="_blank"
@@ -159,6 +160,7 @@ export function Header() {
           >
             Instagram {site.contact.instagramHandle}
           </a>
+          )}
         </nav>
       </div>
     </header>

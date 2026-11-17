@@ -41,10 +41,9 @@ dado fictício.
 | `contact.whatsappDisplay`     | número formatado exibido no rodapé e no contato                  |
 | `contact.email`               | e-mail público no rodapé e na página de contato                  |
 | `contact.address`             | endereço no rodapé e na página de contato                        |
-| `contact.instagram`           | perfil do Instagram (hoje aponta para **@emsconsultoria.adm**)  |
+| `contact.instagram`           | perfil do Instagram da EMS Logística (vazio = links ocultos)    |
 | `hero.video` / `hero.image`   | substitui a composição provisória da hero pela mídia final       |
 | `showPendingMediaBadges`      | exibe/oculta os selos "Fotografia pendente"                     |
-| `complementary[].delivery`    | `"parceiro"` ou `"direto"` para cada solução complementar        |
 
 ### Envio dos formulários — variáveis de ambiente
 
@@ -152,9 +151,8 @@ Depuração: `/?jt=12.5` posiciona a animação no segundo 12,5 (pausada).
 - [ ] **Hero:** vídeo/foto fotorealista do caminhão com a marca EMS (hoje há uma composição provisória identificada).
 - [ ] **Fotografias** das soluções e da seção "A EMS" (hoje com selos "Fotografia pendente").
 - [ ] **WhatsApp comercial, e-mail e endereço** oficiais.
-- [ ] **Instagram:** o link atual é o da EMS Consultoria (@emsconsultoria.adm). Trocar se houver perfil próprio da EMS Logística.
+- [ ] **Instagram:** preencher `contact.instagram` com o perfil próprio da EMS Logística (não usar o da EMS Consultoria, que é outra empresa). Enquanto vazio, os links ficam ocultos.
 - [ ] **Assinatura da marca:** a logo é uma reconstrução vetorial do monograma EMS com o descritor "LOGÍSTICA". Validar com a versão oficial.
-- [ ] **Soluções complementares:** confirmar quais são prestadas diretamente e quais por parceiros.
 - [ ] **Textos comerciais** das soluções: revisar afirmações específicas.
 - [ ] **Política de privacidade:** preencher os campos `[a confirmar]` (razão social, CNPJ, endereço, encarregado, prazos, provedor de e-mail) e submeter à revisão jurídica.
 - [ ] **Domínio** (`NEXT_PUBLIC_SITE_URL`) e **provedor de e-mail** em produção.

@@ -1,5 +1,5 @@
 import { useId } from "react";
-import { CloudLayer, FarLayer, MidLayer } from "./Backdrop";
+import { CloudLayer, FarLayer, MidLayer, type Span } from "./Backdrop";
 import { GROUND_Y, JOURNEY, MONO, TRUCK } from "./config";
 import { Ferry, River } from "./Ferry";
 import { FuelPump, FuelStationBack } from "./FuelStation";
@@ -15,43 +15,55 @@ import { WAREHOUSE, WarehouseBack, WarehouseFront } from "./Warehouse";
  * Composição completa da jornada, em ordem de profundidade:
  * fundo → parallax → (mundo: cenários de fundo, pista, balsa, caminhão,
  * água, primeiro plano) → abertura com a marca.
+ *
+ * `ambient`: versão decorativa (faixa da hero) — sem fundo próprio, sem
+ * abertura com a marca e com a pista prolongada para os dois lados, para
+ * enquadramentos mais largos que o palco. `span` é a faixa horizontal (em
+ * coordenadas de tela do SVG) que as camadas de fundo precisam cobrir.
  */
-export function JourneyScene({ plan }: { plan: JourneyPlan }) {
+export function JourneyScene({ plan, ambient }: { plan: JourneyPlan; ambient?: { span: Span } }) {
   const P = plan.pos;
+  const EXT = ambient ? 8000 : 0;
   const irisId = `iris-${useId().replace(/[^a-zA-Z0-9_-]/g, "")}`;
   const W2 = WAREHOUSE.wall;
   const startScreen = TRUCK.anchorX + JOURNEY.startDrift;
 
   const roadSegments = [
-    [P.originLeft, P.bankLeft],
-    [P.bankRight, P.worldEnd],
+    [P.originLeft - EXT, P.bankLeft],
+    [P.bankRight, P.worldEnd + EXT],
   ] as const;
   const dashes = [
+    ...(ambient ? [[P.originLeft - EXT, P.originLeft - 40] as const] : []),
     [P.originDoor + W2 + 30, P.stopLine - 12],
     [P.stopLine + 352, P.bankLeft - 40],
     [P.bankRight + 40, P.destDoor - 30],
+    ...(ambient ? [[P.destRight + 40, P.worldEnd + EXT] as const] : []),
   ] as const;
   const curbs = [
-    [P.originLeft, P.stopLine + 150],
+    [P.originLeft - EXT, P.stopLine + 150],
     [P.stopLine + 340, P.bankLeft - 30],
-    [P.bankRight + 30, P.worldEnd],
+    [P.bankRight + 30, P.worldEnd + EXT],
   ] as const;
 
   const props = buildRoadProps(plan);
 
   return (
     <>
-      <defs>
-        <clipPath id={irisId}>
-          <circle data-j="iris" cx={startScreen + TRUCK.logo.cx} cy={GROUND_Y + TRUCK.logo.cy} r={0} />
-        </clipPath>
-      </defs>
-      <rect x={-400} y={-200} width={2400} height={1040} fill={MONO.bg} />
+      {!ambient && (
+        <>
+          <defs>
+            <clipPath id={irisId}>
+              <circle data-j="iris" cx={startScreen + TRUCK.logo.cx} cy={GROUND_Y + TRUCK.logo.cy} r={0} />
+            </clipPath>
+          </defs>
+          <rect x={-400} y={-200} width={2400} height={1040} fill={MONO.bg} />
+        </>
+      )}
 
-      <g data-j="scene" clipPath={`url(#${irisId})`}>
-        <CloudLayer />
-        <FarLayer />
-        <MidLayer />
+      <g data-j="scene" clipPath={ambient ? undefined : `url(#${irisId})`}>
+        <CloudLayer span={ambient?.span} />
+        <FarLayer span={ambient?.span} />
+        <MidLayer span={ambient?.span} />
 
         <g data-j="world">
           {/* cenários de fundo (atrás do caminhão) */}
@@ -80,7 +92,7 @@ export function JourneyScene({ plan }: { plan: JourneyPlan }) {
         </g>
       </g>
 
-      <IntroLogo />
+      {!ambient && <IntroLogo />}
     </>
   );
 }

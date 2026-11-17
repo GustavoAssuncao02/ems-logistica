@@ -15,7 +15,7 @@ export const ROAD_H = 60;
 export const WATER_Y = 536;
 
 /** Paleta estritamente monocromática (preto, branco e cinzas neutros). */
-export const MONO = {
+export const MONO_HEX = {
   ink: "#0E0E0E",
   paper: "#FFFFFF",
   bg: "#F3F3F3",
@@ -25,7 +25,22 @@ export const MONO = {
   g4: "#8E8E8E",
   g5: "#2E2E2E",
   wall: "#E4E4E4",
+  water: "#DEDEDE",
+  edge: "#3A3A3A",
+  label: "#A8A8A8",
+  column: "#D8D8D8",
 } as const;
+
+type Tone = keyof typeof MONO_HEX;
+
+/**
+ * Cores usadas no desenho: cada uma é uma variável CSS (`--j-<tom>`) com a
+ * paleta clara como padrão. Um contêiner pode redefinir as variáveis para
+ * trocar o tema da cena inteira (ver `.journey-night` em globals.css).
+ */
+export const MONO = Object.fromEntries(
+  Object.entries(MONO_HEX).map(([k, v]) => [k, `var(--j-${k}, ${v})`]),
+) as Record<Tone, string>;
 
 export const TRUCK = {
   /** Comprimento do caminhão (traseira → para-choque). */

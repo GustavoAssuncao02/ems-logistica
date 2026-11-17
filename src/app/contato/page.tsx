@@ -39,12 +39,14 @@ export default function ContatoPage() {
                     </a>
                   </li>
                 )}
+                {contact.instagram && (
                 <li>
                   <a href={contact.instagram} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 font-semibold text-navy hover:underline">
                     <InstagramIcon />
                     {contact.instagramHandle}
                   </a>
                 </li>
+                )}
                 {contact.address && <li className="text-slate">{contact.address}</li>}
               </ul>
             </div>

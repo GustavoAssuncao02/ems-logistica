@@ -28,11 +28,11 @@ export function About() {
           <Reveal>
             <p className="eyebrow text-orange-600">A EMS</p>
             <h2 id="sobre-title" className="mt-5 text-4xl font-extrabold leading-[1.08] sm:text-5xl">
-              Muito além do transporte. Uma visão completa de gestão.
+              Muito além do transporte. Uma visão completa da operação logística.
             </h2>
             <p className="mt-7 text-lg leading-relaxed text-slate">
-              A EMS Logística reúne soluções voltadas ao apoio à gestão empresarial, incluindo logística e fretes, com foco em planejamento,
-              organização e desenvolvimento das operações de seus clientes.
+              A EMS Logística atua em logística, gestão de fretes e transporte rodoviário de cargas, com foco em planejamento,
+              organização e eficiência nas operações de seus clientes.
             </p>
           </Reveal>
 
