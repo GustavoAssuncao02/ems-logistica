@@ -44,16 +44,57 @@ function ridge(tile: number, y0: number, harmonics: [number, number, number][], 
   return `${d} L${tile} ${bottom} Z`;
 }
 
+const copiesFor = (width: number, tile: number) => Math.ceil(width / tile) + 1;
+
 function Tiled({ id, tile, width, children }: { id: LayerId; tile: number; width: number; children: ReactNode }) {
-  const copies = Math.ceil(width / tile) + 1;
   return (
     <g data-r={`layer-${id}`}>
-      {Array.from({ length: copies }, (_, i) => (
+      {Array.from({ length: copiesFor(width, tile) }, (_, i) => (
         <g key={i} transform={`translate(${i * tile} 0)`}>
           {children}
         </g>
       ))}
     </g>
+  );
+}
+
+/**
+ * Plano do cenário: um <svg> próprio, empilhado sob a pista. Os planos que
+ * se movem (`moving`) são deslocados pelo motor com `transform` de CSS e
+ * viram camadas da GPU — são rasterizados uma vez e só "deslizam", sem
+ * redesenhar a cada quadro (essencial no celular).
+ *
+ * `units` = largura do plano em unidades da cena; `scale` = px por unidade.
+ */
+type PlaneProps = { id: string; units: number; scale: number; moving?: boolean; hidden?: boolean; children: ReactNode };
+
+function Plane({ id, units, scale, moving = false, hidden = false, children }: PlaneProps) {
+  return (
+    <svg
+      data-plane={id}
+      viewBox={`0 0 ${units} ${H}`}
+      preserveAspectRatio="xMinYMax meet"
+      className="absolute bottom-0 left-0 block h-full max-w-none"
+      style={{ width: units * scale, display: hidden ? "none" : undefined, willChange: moving ? "transform" : undefined }}
+      focusable="false"
+      aria-hidden="true"
+    >
+      {children}
+    </svg>
+  );
+}
+
+/** Camada repetida lado a lado, num plano próprio movido pela GPU. */
+function TiledPlane({ id, tile, width, scale, children }: { id: LayerId; tile: number; width: number; scale: number; children: ReactNode }) {
+  const copies = copiesFor(width, tile);
+  return (
+    <Plane id={`layer-${id}`} units={copies * tile} scale={scale} moving>
+      {Array.from({ length: copies }, (_, i) => (
+        <g key={i} transform={`translate(${i * tile} 0)`}>
+          {children}
+        </g>
+      ))}
+    </Plane>
   );
 }
 
@@ -115,61 +156,69 @@ const HILLS = ridge(1600, 204, [
   [9, 4, 0.2],
 ]);
 
-/** Fundo completo, do céu ao asfalto. `width` = largura da cena (unidades). */
-export function Scenery({ width }: { width: number }) {
+/**
+ * Fundo completo, do céu ao acostamento, em planos empilhados (ver `Plane`).
+ * `width` = largura da cena (unidades); `scale` = px por unidade.
+ */
+export function Scenery({ width, scale }: { width: number; scale: number }) {
   return (
     <>
-      <defs>
-        <linearGradient id="hr-sky" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#0B1A38" stopOpacity="0" />
-          <stop offset="0.3" stopColor="#1A2350" stopOpacity="0.55" />
-          <stop offset="0.55" stopColor="#3C3768" />
-          <stop offset="0.78" stopColor="#8D5A72" />
-          <stop offset="0.95" stopColor="#E48A5A" />
-        </linearGradient>
-        <radialGradient id="hr-sun">
-          <stop offset="0" stopColor={C.sun} stopOpacity="0.9" />
-          <stop offset="0.35" stopColor="#FFB070" stopOpacity="0.35" />
-          <stop offset="1" stopColor="#FFB070" stopOpacity="0" />
-        </radialGradient>
-        <pattern id="hr-win-a" width={10} height={12} patternUnits="userSpaceOnUse">
-          <rect x={3} y={3} width={3.5} height={4.5} fill={C.warm} opacity={0.75} />
-        </pattern>
-        <pattern id="hr-win-b" width={14} height={10} patternUnits="userSpaceOnUse">
-          <rect x={4} y={2} width={6} height={3} fill={C.warm} opacity={0.6} />
-        </pattern>
-        <radialGradient id="hr-lamp">
-          <stop offset="0" stopColor={C.warm} stopOpacity="0.8" />
-          <stop offset="1" stopColor={C.warm} stopOpacity="0" />
-        </radialGradient>
-      </defs>
+      {/* céu e sol (estáticos); as definições servem a todos os planos — este nunca é ocultado */}
+      <Plane id="sky" units={width} scale={scale}>
+        <defs>
+          <linearGradient id="hr-sky" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stopColor="#0B1A38" stopOpacity="0" />
+            <stop offset="0.3" stopColor="#1A2350" stopOpacity="0.55" />
+            <stop offset="0.55" stopColor="#3C3768" />
+            <stop offset="0.78" stopColor="#8D5A72" />
+            <stop offset="0.95" stopColor="#E48A5A" />
+          </linearGradient>
+          <radialGradient id="hr-sun">
+            <stop offset="0" stopColor={C.sun} stopOpacity="0.9" />
+            <stop offset="0.35" stopColor="#FFB070" stopOpacity="0.35" />
+            <stop offset="1" stopColor="#FFB070" stopOpacity="0" />
+          </radialGradient>
+          <pattern id="hr-win-a" width={10} height={12} patternUnits="userSpaceOnUse">
+            <rect x={3} y={3} width={3.5} height={4.5} fill={C.warm} opacity={0.75} />
+          </pattern>
+          <pattern id="hr-win-b" width={14} height={10} patternUnits="userSpaceOnUse">
+            <rect x={4} y={2} width={6} height={3} fill={C.warm} opacity={0.6} />
+          </pattern>
+          <radialGradient id="hr-lamp">
+            <stop offset="0" stopColor={C.warm} stopOpacity="0.8" />
+            <stop offset="1" stopColor={C.warm} stopOpacity="0" />
+          </radialGradient>
+        </defs>
 
-      <rect x={0} y={0} width={width} height={ROAD.top + 4} fill="url(#hr-sky)" />
-      <circle cx={r1(width * 0.8)} cy={166} r={120} fill="url(#hr-sun)" />
-      <circle cx={r1(width * 0.8)} cy={166} r={24} fill={C.sun} />
+        <rect x={0} y={0} width={width} height={ROAD.top + 4} fill="url(#hr-sky)" />
+        <circle cx={r1(width * 0.8)} cy={166} r={120} fill="url(#hr-sun)" />
+        <circle cx={r1(width * 0.8)} cy={166} r={24} fill={C.sun} />
+      </Plane>
 
-      <Tiled id="far" tile={2400} width={width}>
+      <TiledPlane id="far" tile={2400} width={width} scale={scale}>
         <path d={FAR} fill={C.mountFar} />
-      </Tiled>
-      <Tiled id="near" tile={2000} width={width}>
+      </TiledPlane>
+      <TiledPlane id="near" tile={2000} width={width} scale={scale}>
         <path d={NEAR} fill={C.mountNear} />
-      </Tiled>
-      <Tiled id="hills" tile={1600} width={width}>
+      </TiledPlane>
+      <TiledPlane id="hills" tile={1600} width={width} scale={scale}>
         <path d={HILLS} fill={C.hills} />
-      </Tiled>
-      <Cities />
-      <Tiled id="grove" tile={1400} width={width}>
+      </TiledPlane>
+      <Cities scale={scale} />
+      <TiledPlane id="grove" tile={1400} width={width} scale={scale}>
         <Grove />
-      </Tiled>
+      </TiledPlane>
 
-      <rect x={0} y={194} width={width} height={22} fill={C.verge} />
+      <Plane id="verge" units={width} scale={scale}>
+        <rect x={0} y={194} width={width} height={22} fill={C.verge} />
+      </Plane>
 
-      <Tiled id="trees" tile={2200} width={width}>
+      <TiledPlane id="trees" tile={2200} width={width} scale={scale}>
         {trees(7, 2200, 22, 210, 54, 104)}
-      </Tiled>
-      <Tiled id="side" tile={1800} width={width}>
+      </TiledPlane>
+      <TiledPlane id="side" tile={1800} width={width} scale={scale}>
         <Roadside />
-      </Tiled>
+      </TiledPlane>
     </>
   );
 }
@@ -299,14 +348,18 @@ function Skyline({ seed, width }: { seed: number; width: number }) {
   return <>{out}</>;
 }
 
-/** Três cidades reutilizáveis; o motor posiciona, mostra e esconde cada uma. */
-function Cities() {
+/**
+ * Três cidades reutilizáveis, cada uma num plano próprio; o motor posiciona,
+ * mostra e esconde cada uma (a folga de 80 unidades acomoda o último prédio,
+ * que pode passar um pouco da largura nominal).
+ */
+function Cities({ scale }: { scale: number }) {
   return (
     <>
       {CITY_WIDTHS.map((w, i) => (
-        <g key={i} data-r={`city-${i}`} display="none">
+        <Plane key={i} id={`city-${i}`} units={w + 80} scale={scale} moving hidden>
           <Skyline seed={101 + i * 37} width={w} />
-        </g>
+        </Plane>
       ))}
     </>
   );

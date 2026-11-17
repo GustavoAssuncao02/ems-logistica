@@ -47,19 +47,19 @@ export function Hero() {
         <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-navy-950/70 to-transparent" />
       </div>
 
-      <div className="container-ems flex flex-1 flex-col justify-center pb-10 pt-32 lg:pb-12">
+      <div className="container-ems flex flex-1 flex-col justify-center pb-6 pt-24 sm:pb-10 sm:pt-32 lg:pb-12">
         <div className="max-w-[44rem]">
           <p data-header-trigger className="eyebrow hero-in text-orange" style={{ animationDelay: "80ms" }}>
             {site.eyebrow}
           </p>
-          <h1 id="hero-title" className="hero-in mt-6 text-[2.6rem] font-extrabold leading-[1.04] text-white sm:text-6xl lg:text-[4.6rem]" style={{ animationDelay: "180ms" }}>
+          <h1 id="hero-title" className="hero-in mt-4 sm:mt-6 text-[2.6rem] font-extrabold leading-[1.04] text-white sm:text-6xl lg:text-[4.6rem]" style={{ animationDelay: "180ms" }}>
             Do planejamento à estrada.{" "}
             <span className="text-white/75">Logística que conecta negócios.</span>
           </h1>
-          <p className="hero-in mt-7 max-w-xl text-lg leading-relaxed text-white/80 sm:text-xl" style={{ animationDelay: "300ms" }}>
+          <p className="hero-in mt-5 max-w-xl text-base leading-relaxed sm:mt-7 sm:text-lg text-white/80 sm:text-xl" style={{ animationDelay: "300ms" }}>
             {site.description}
           </p>
-          <div className="hero-in mt-10 flex flex-col gap-3 sm:flex-row" style={{ animationDelay: "420ms" }}>
+          <div className="hero-in mt-8 flex flex-col gap-3 sm:mt-10 sm:flex-row" style={{ animationDelay: "420ms" }}>
             <ButtonLink href="/#cotacao" arrow>
               Solicitar uma cotação
             </ButtonLink>
@@ -70,8 +70,9 @@ export function Hero() {
         </div>
       </div>
 
-      {/* faixa animada: carreta EMS na estrada */}
-      <div className="relative h-[clamp(150px,27svh,270px)] w-full shrink-0">
+      {/* faixa animada: carreta EMS na estrada. No celular a altura acompanha a
+          largura (32vw), para a carreta caber inteira com cenário em volta. */}
+      <div className="relative h-[min(clamp(150px,27svh,270px),32vw)] w-full shrink-0">
         <HeroRoad className="absolute inset-0" />
 
         {!hasMedia && site.showPendingMediaBadges && (

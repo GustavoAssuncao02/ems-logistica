@@ -71,9 +71,15 @@ const introX = (w: number) => Math.max(baseX(w) + driftAmp(w), Math.min(w * 0.3,
  */
 export function HeroRoad({ className = "" }: { className?: string }) {
   const rootRef = useRef<HTMLDivElement>(null);
+  const stageRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
   const [width, setWidth] = useState(2000);
+  const [scale, setScale] = useState(1);
   const widthRef = useRef(width);
+  /** px por unidade da cena (altura da faixa / H). */
+  const scaleRef = useRef(scale);
+  /** Redesenha o quadro atual (após redimensionar, com a animação parada). */
+  const redrawRef = useRef<(() => void) | null>(null);
 
   useEffect(() => {
     const node = rootRef.current;
@@ -83,7 +89,10 @@ export function HeroRoad({ className = "" }: { className?: string }) {
       if (w > 0 && h > 0) {
         const next = Math.round((H * w) / h);
         widthRef.current = next;
+        scaleRef.current = h / H;
         setWidth(next);
+        setScale(h / H);
+        redrawRef.current?.();
       }
     };
     update();
@@ -95,12 +104,18 @@ export function HeroRoad({ className = "" }: { className?: string }) {
   useEffect(() => {
     const svg = svgRef.current;
     const root = rootRef.current;
-    if (!svg || !root) return;
+    const stage = stageRef.current;
+    if (!svg || !root || !stage) return;
 
     const q = (k: string) => svg.querySelector<SVGElement>(`[data-r="${k}"]`);
     const qa = (k: string) => Array.from(svg.querySelectorAll<SVGElement>(`[data-r="${k}"]`));
+    const plane = (k: string) => root.querySelector<SVGSVGElement>(`[data-plane="${k}"]`);
     const el = {
-      layers: LAYERS.map((l) => ({ ...l, node: q(`layer-${l.id}`) })),
+      // camadas em plano próprio (movidas por CSS, na GPU) ou dentro da pista (atributo)
+      layers: LAYERS.map((l) => {
+        const p = plane(`layer-${l.id}`);
+        return { ...l, node: (p ?? q(`layer-${l.id}`)) as SVGElement | null, css: Boolean(p) };
+      }),
       rig: q("rig"),
       cab: q("rig-cab"),
       trailer: q("rig-trailer"),
@@ -122,7 +137,7 @@ export function HeroRoad({ className = "" }: { className?: string }) {
       scaleBar: q("scale-bar"),
       scaleLight: q("scale-light"),
       cars: Array.from({ length: CARS }, (_, i) => ({ node: q(`car-${i}`), body: q(`car-body-${i}`) })),
-      cities: CITY_WIDTHS.map((_, i) => q(`city-${i}`)),
+      cities: CITY_WIDTHS.map((_, i) => plane(`city-${i}`)),
       depot: q("depot"),
       cargo: Array.from({ length: LOAD.boxes }, (_, i) => q(`cargo-${i}`)),
       door: q("rear-door"),
@@ -138,6 +153,18 @@ export function HeroRoad({ className = "" }: { className?: string }) {
       rec[name] = v;
       node.setAttribute(name, v);
     };
+    /** Estilo inline dos planos da GPU, com o mesmo cache. */
+    const css = (node: SVGElement | null | undefined, name: "transform" | "display", v: string) => {
+      if (!node) return;
+      let rec = cache.get(node);
+      if (!rec) cache.set(node, (rec = {}));
+      const k = `style:${name}`;
+      if (rec[k] === v) return;
+      rec[k] = v;
+      node.style[name] = v;
+    };
+    /** Deslocamento horizontal de um plano: unidades da cena → px. */
+    const shift = (units: number) => `translate3d(${Math.round(units * scaleRef.current * 100) / 100}px,0,0)`;
 
     const V = SPEED.cruise;
     const firstRun = randInt(CITY.run);
@@ -176,7 +203,7 @@ export function HeroRoad({ className = "" }: { className?: string }) {
 
     // uma cidade já em cena desde o início
     st.cities[0] = { ...st.cities[0], x: widthRef.current * 0.42, on: true };
-    set(el.cities[0], "display", "inline");
+    css(el.cities[0], "display", "block");
 
     const truckX = (w: number) => {
       const normal = baseX(w) + driftAmp(w) * (1 + st.k * st.drift);
@@ -362,17 +389,17 @@ export function HeroRoad({ className = "" }: { className?: string }) {
           st.cities[i].x = w + 10;
           st.cities[i].on = true;
           st.cityNext = i + 1;
-          set(el.cities[i], "display", "inline");
+          css(el.cities[i], "display", "block");
           break;
         }
       }
       st.cities.forEach((c, i) => {
         if (!c.on) return;
         c.x -= st.v * ((w + c.w) / (CITY.cross * V)) * dt;
-        set(el.cities[i], "transform", `translate(${c.x} 0)`);
+        css(el.cities[i], "transform", shift(c.x));
         if (c.x + c.w < -10) {
           c.on = false;
-          set(el.cities[i], "display", "none");
+          css(el.cities[i], "display", "none");
         }
       });
 
@@ -398,7 +425,11 @@ export function HeroRoad({ className = "" }: { className?: string }) {
       });
 
       // ── cenário em parallax
-      for (const l of el.layers) set(l.node, "transform", `translate(${-mod(st.s * l.f, l.tile)} 0)`);
+      for (const l of el.layers) {
+        const dx = -mod(st.s * l.f, l.tile);
+        if (l.css) css(l.node, "transform", shift(dx));
+        else set(l.node, "transform", `translate(${dx} 0)`);
+      }
 
       // ── carreta
       set(el.rig, "transform", `translate(${tx} ${GROUND})`);
@@ -422,14 +453,21 @@ export function HeroRoad({ className = "" }: { className?: string }) {
     };
 
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    // celular/tablet (toque): 30 qps bastam e poupam bateria e CPU
+    const minFrame = window.matchMedia("(pointer: coarse)").matches ? 1000 / 30 - 2 : 0;
     step(0);
-    svg.style.opacity = "1";
+    redrawRef.current = () => step(0);
+    stage.style.opacity = "1";
     if (reduced) return;
 
     let raf = 0;
     let last = 0;
     let visible = false;
     const loop = (now: number) => {
+      if (last && now - last < minFrame) {
+        raf = requestAnimationFrame(loop);
+        return;
+      }
       const dt = last ? Math.min(0.05, (now - last) / 1000) : 0;
       last = now;
       step(dt);
@@ -447,6 +485,7 @@ export function HeroRoad({ className = "" }: { className?: string }) {
     return () => {
       io.disconnect();
       cancelAnimationFrame(raf);
+      redrawRef.current = null;
     };
   }, []);
 
@@ -455,29 +494,33 @@ export function HeroRoad({ className = "" }: { className?: string }) {
 
   return (
     <div ref={rootRef} className={`road-ribbon overflow-hidden ${className}`} aria-hidden="true">
-      <svg
-        ref={svgRef}
-        viewBox={`0 0 ${width} ${H}`}
-        preserveAspectRatio="xMinYMax slice"
-        className="block h-full w-full select-none opacity-0 transition-opacity duration-1000"
-        focusable="false"
-      >
-        <Scenery width={width} />
-        {layer("back")}
-        <RoadSurface width={width} />
-        {layer("road")}
-        {Array.from({ length: CARS }, (_, i) => (
-          <Car key={i} slot={i} />
-        ))}
-        {/* galpão antes da carreta: as caixas (na carreta) passam por cima da doca */}
-        <Depot />
-        <g data-r="rig" transform={`translate(${tx} ${GROUND})`}>
-          <Rig />
-        </g>
-        {layer("front")}
-        <Foreground width={width} />
-        {layer("over")}
-      </svg>
+      <div ref={stageRef} className="absolute inset-0 select-none opacity-0 transition-opacity duration-1000">
+        {/* cenário em planos próprios (GPU), sob a pista */}
+        <Scenery width={width} scale={scale} />
+        {/* pista e tudo o que muda a cada quadro: paradas, carros, galpão, carreta */}
+        <svg
+          ref={svgRef}
+          viewBox={`0 0 ${width} ${H}`}
+          preserveAspectRatio="xMinYMax slice"
+          className="absolute inset-0 block h-full w-full"
+          focusable="false"
+        >
+          {layer("back")}
+          <RoadSurface width={width} />
+          {layer("road")}
+          {Array.from({ length: CARS }, (_, i) => (
+            <Car key={i} slot={i} />
+          ))}
+          {/* galpão antes da carreta: as caixas (na carreta) passam por cima da doca */}
+          <Depot />
+          <g data-r="rig" transform={`translate(${tx} ${GROUND})`}>
+            <Rig />
+          </g>
+          {layer("front")}
+          <Foreground width={width} />
+          {layer("over")}
+        </svg>
+      </div>
     </div>
   );
 }
