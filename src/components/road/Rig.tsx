@@ -1,6 +1,11 @@
 import { EmsMonogram, MONOGRAM_COLOR } from "@/components/brand/EmsMonogram";
 import { LOGO_CENTER, LOGO_WIDTH } from "@/components/brand/logoGeometry";
-import { C, RIG } from "./constants";
+import { C, CARGO, LOAD, RIG } from "./constants";
+
+const WIN = CARGO.win;
+const CARTONS = ["#C8955A", "#BE8A50", "#D2A068"];
+const CARTON_EDGE = "#A8743E";
+const TAPE = "#E8C28A";
 
 const PANEL = "#DDE0E4";
 const LINE = "#C3C9D1";
@@ -49,11 +54,39 @@ export function Rig() {
           <stop offset="0" stopColor="#FFE9B0" stopOpacity="0.45" />
           <stop offset="1" stopColor="#FFE9B0" stopOpacity="0" />
         </linearGradient>
+        <linearGradient id="hr-beam-high" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0" stopColor="#FFF4D6" stopOpacity="0.6" />
+          <stop offset="0.5" stopColor="#FFF0C8" stopOpacity="0.22" />
+          <stop offset="1" stopColor="#FFF0C8" stopOpacity="0" />
+        </linearGradient>
+        <linearGradient id="hr-cargo-in" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#2A2E35" />
+          <stop offset="1" stopColor="#454A52" />
+        </linearGradient>
+        <radialGradient id="hr-cargo-lamp" cx="0.55" cy="0.05" r="0.9">
+          <stop offset="0" stopColor={C.warm} stopOpacity="0.35" />
+          <stop offset="1" stopColor={C.warm} stopOpacity="0" />
+        </radialGradient>
+        {/* caixas: visíveis na doca (x < 0) e dentro da janela de carga */}
+        <clipPath id="hr-cargo-clip">
+          <rect x={-400} y={-300} width={400} height={300} />
+          <rect x={WIN.x} y={WIN.y} width={WIN.w} height={WIN.h} />
+        </clipPath>
+        <clipPath id="hr-win-clip">
+          <rect x={WIN.x} y={WIN.y} width={WIN.w} height={WIN.h} />
+        </clipPath>
+        <radialGradient id="hr-head-glow">
+          <stop offset="0" stopColor="#FFFFFF" stopOpacity="0.95" />
+          <stop offset="1" stopColor="#FFF4D6" stopOpacity="0" />
+        </radialGradient>
       </defs>
 
       {/* sombra e facho do farol */}
       <ellipse cx={304} cy={1} rx={322} ry={6} fill="#000" opacity={0.35} />
-      <path d="M606 -54 L800 -38 L800 0 L606 -46 Z" fill="url(#hr-beam)" />
+      {/* faróis: baixo (curto, inclinado para o chão) e alto (longo, mais forte) */}
+      <path data-r="beam-low" d="M606 -54 L800 -38 L800 0 L606 -46 Z" fill="url(#hr-beam)" />
+      <path data-r="beam-high" d="M606 -58 L1080 -96 L1080 -8 L606 -44 Z" fill="url(#hr-beam-high)" opacity={0} />
+      <circle data-r="head-glow" cx={602} cy={-52} r={16} fill="url(#hr-head-glow)" opacity={0} />
 
       {/* ── semirreboque ─────────────────────────────────────────── */}
       <g data-r="rig-trailer">
@@ -85,6 +118,34 @@ export function Rig() {
           <EmsMonogram palette={MONOGRAM_COLOR} gapColor="#E9EBEE" />
         </g>
         <rect data-r="brake" x={-3} y={BOX.bottom - 2} width={6} height={10} rx={1.5} fill="#7A1D1D" />
+
+        {/* compartimento de carga: janela aberta na traseira, caixas empilhadas
+            dentro e porta de enrolar que desce de cima para baixo */}
+        <rect x={WIN.x} y={WIN.y} width={WIN.w} height={WIN.h} fill="url(#hr-cargo-in)" />
+        <rect x={WIN.x} y={WIN.y} width={WIN.w} height={WIN.h} fill="url(#hr-cargo-lamp)" />
+        <g clipPath="url(#hr-cargo-clip)">
+          {Array.from({ length: LOAD.boxes }, (_, i) => (
+            <g key={i} data-r={`cargo-${i}`} transform={`translate(${LOAD.from} ${CARGO.floor})`} opacity={0}>
+              <rect x={0} y={-CARGO.box.h} width={CARGO.box.w} height={CARGO.box.h} rx={1.5} fill={CARTONS[i % CARTONS.length]} stroke={CARTON_EDGE} strokeWidth={1} />
+              <rect x={12} y={-CARGO.box.h} width={6} height={CARGO.box.h} fill={TAPE} opacity={0.85} />
+              <rect x={4} y={-9} width={8} height={5} fill="#FFFFFF" opacity={0.55} />
+            </g>
+          ))}
+        </g>
+        {/* coluna traseira do baú, por cima das caixas que passam */}
+        <rect x={0} y={BOX.top + 3} width={WIN.x} height={BOX.bottom - BOX.top - 6} fill={PANEL} stroke={LINE} strokeWidth={0.8} />
+        <g clipPath="url(#hr-win-clip)">
+          <g data-r="rear-door" transform={`translate(0 ${-WIN.h})`}>
+            <rect x={WIN.x} y={WIN.y} width={WIN.w} height={WIN.h} fill="url(#hr-box)" />
+            {Array.from({ length: 10 }, (_, i) => (
+              <line key={i} x1={WIN.x} y1={WIN.y + 9 + i * 9} x2={WIN.x + WIN.w} y2={WIN.y + 9 + i * 9} stroke={LINE} strokeWidth={1} opacity={0.7} />
+            ))}
+            <rect x={WIN.x} y={WIN.y + WIN.h - 5} width={WIN.w} height={5} fill={PANEL} stroke={LINE} strokeWidth={0.8} />
+            <rect x={WIN.x + WIN.w / 2 - 9} y={WIN.y + WIN.h - 11} width={18} height={4} rx={2} fill="#7C8590" />
+          </g>
+        </g>
+        {/* rolo da porta, no alto da janela */}
+        <rect x={WIN.x} y={WIN.y} width={WIN.w} height={4} fill="#B9C0C9" />
 
         {/* para-lama sobre o conjunto de eixos + para-barro */}
         <path d={fender(a1, a3)} fill="none" stroke={DARK} strokeWidth={5} strokeLinecap="round" />

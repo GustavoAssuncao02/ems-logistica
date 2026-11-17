@@ -1,12 +1,13 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { CAR_SECONDS, CITY, CRUISE_SECONDS, FAR_GROUND, GROUND, H, PASS_SECONDS, RIG, SPEED } from "./constants";
+import { CAR_SECONDS, CARGO, CITY, CRUISE_SECONDS, FAR_GROUND, GROUND, H, LOAD, LOAD_DOOR, LOAD_GO, PASS_SECONDS, RIG, SPEED, cargoSlot } from "./constants";
+import { Depot } from "./Depot";
 import { Car, Rig } from "./Rig";
 import { CITY_WIDTHS, Foreground, LAYERS, RoadSurface, Scenery } from "./Scenery";
 import { PASSING, Stop, STOP_KINDS, STOPPING, STOPS, type StopKind, type StopLayer } from "./Stops";
 
-type Phase = "cruise" | "approach" | "brake" | "stopped" | "depart";
+type Phase = "loading" | "cruise" | "approach" | "brake" | "stopped" | "depart";
 
 type Event = {
   kind: StopKind;
@@ -48,11 +49,15 @@ function draw(bag: StopKind[], all: StopKind[], last: StopKind | null) {
 /** Posição horizontal da carreta na tela (sem o vaivém). */
 const baseX = (w: number) => Math.max(24, w * 0.03);
 const driftAmp = (w: number) => Math.min(46, w * 0.03);
+/** Posição da carreta encostada na doca, na abertura (deixa o galpão à vista). */
+const introX = (w: number) => Math.max(baseX(w) + driftAmp(w), Math.min(w * 0.3, w - RIG.length - 60));
 
 /**
  * Estrada sem fim da hero: a carreta EMS roda pela rodovia ao entardecer,
  * com montanhas, cidades, morros e árvores em parallax.
  *
+ *  • Abertura: a carreta está de ré na doca do centro de distribuição EMS;
+ *    as caixas entram no baú, a porta fecha e ela parte.
  *  • A cada ~15 s rodando, tira do "baralho" uma parada — pedágio, posto,
  *    semáforo ou balança —, freia até o ponto exato, cumpre a parada e
  *    segue. Todas aparecem antes de alguma se repetir.
@@ -101,6 +106,9 @@ export function HeroRoad({ className = "" }: { className?: string }) {
       trailer: q("rig-trailer"),
       wheels: qa("wheel"),
       brake: q("brake"),
+      beamLow: q("beam-low"),
+      beamHigh: q("beam-high"),
+      headGlow: q("head-glow"),
       stops: Object.fromEntries(
         STOP_KINDS.map((k) => [k, LAYER_ORDER.map((l) => q(`stop-${k}-${l}`)).filter(Boolean) as SVGElement[]]),
       ) as Record<StopKind, SVGElement[]>,
@@ -115,6 +123,9 @@ export function HeroRoad({ className = "" }: { className?: string }) {
       scaleLight: q("scale-light"),
       cars: Array.from({ length: CARS }, (_, i) => ({ node: q(`car-${i}`), body: q(`car-body-${i}`) })),
       cities: CITY_WIDTHS.map((_, i) => q(`city-${i}`)),
+      depot: q("depot"),
+      cargo: Array.from({ length: LOAD.boxes }, (_, i) => q(`cargo-${i}`)),
+      door: q("rear-door"),
     };
 
     const cache = new WeakMap<Element, Record<string, string>>();
@@ -132,12 +143,17 @@ export function HeroRoad({ className = "" }: { className?: string }) {
     const firstRun = randInt(CITY.run);
     const st = {
       s: 0,
-      v: V as number,
+      v: 0,
       a: 0,
       clock: 0,
       drift: 0,
-      k: 1,
-      phase: "cruise" as Phase,
+      k: 0,
+      phase: "loading" as Phase,
+      /** Abertura: tempo de carga, mistura posição-da-doca → posição normal, galpão. */
+      introT: 0,
+      ib: 1,
+      depotX: 0,
+      depotOn: true,
       stopTimer: rand(CRUISE_SECONDS),
       passTimer: rand(PASS_SECONDS),
       ev: null as Event | null,
@@ -146,6 +162,8 @@ export function HeroRoad({ className = "" }: { className?: string }) {
       stopBag: [] as StopKind[],
       passBag: [] as StopKind[],
       carTimer: rand([2, 5]),
+      /** Farol alto (1) ↔ baixo (0), com transição suave. */
+      high: 0,
       cars: Array.from({ length: CARS }, () => ({ x: 0, on: false })),
       cities: CITY_WIDTHS.map((w) => ({ x: 0, on: false, w })),
       cityAcc: 0,
@@ -160,7 +178,10 @@ export function HeroRoad({ className = "" }: { className?: string }) {
     st.cities[0] = { ...st.cities[0], x: widthRef.current * 0.42, on: true };
     set(el.cities[0], "display", "inline");
 
-    const truckX = (w: number) => baseX(w) + driftAmp(w) * (1 + st.k * st.drift);
+    const truckX = (w: number) => {
+      const normal = baseX(w) + driftAmp(w) * (1 + st.k * st.drift);
+      return normal + (introX(w) - normal) * smooth(0, 1, st.ib);
+    };
 
     const spawn = (kind: StopKind, front: number, w: number) => {
       const cfg = STOPS[kind];
@@ -194,6 +215,8 @@ export function HeroRoad({ className = "" }: { className?: string }) {
       st.drift = 0.62 * Math.sin(st.clock * 0.23) + 0.38 * Math.sin(st.clock * 0.57 + 1.3);
       const target = st.phase === "cruise" ? 1 : 0;
       st.k += (target - st.k) * Math.min(1, dt * 0.9 * Math.max(moving, 0.05));
+      // depois de partir da doca, a carreta volta aos poucos para a posição normal
+      if (st.phase !== "loading") st.ib = Math.max(0, st.ib - dt * moving * 0.4);
 
       const tx = truckX(w);
       const front = st.s + tx + RIG.length;
@@ -201,6 +224,12 @@ export function HeroRoad({ className = "" }: { className?: string }) {
       const ev = st.ev;
 
       switch (st.phase) {
+        case "loading":
+          st.v = 0;
+          st.introT += dt;
+          st.depotX = st.s + tx;
+          if (st.introT >= LOAD_GO) st.phase = "depart";
+          break;
         case "cruise":
           st.v = Math.min(V, st.v + SPEED.accel * dt);
           if (st.v >= V) {
@@ -288,6 +317,30 @@ export function HeroRoad({ className = "" }: { className?: string }) {
         }
       }
 
+      // ── centro de distribuição da abertura
+      if (st.depotOn) {
+        const dx = st.depotX - st.s;
+        set(el.depot, "transform", `translate(${dx} 0)`);
+        // caixas: da doca até o lugar na pilha; as de cima sobem antes de
+        // passar pela porta, para não atravessar as de baixo
+        el.cargo.forEach((n, i) => {
+          const t = st.introT - (LOAD.first + i * LOAD.every);
+          if (t < 0) return set(n, "opacity", 0);
+          const [x, y] = cargoSlot(i);
+          const k = smooth(0, LOAD.travel, t);
+          const lift = smooth(0, LOAD.travel * 0.5, t);
+          set(n, "opacity", 1);
+          set(n, "transform", `translate(${LOAD.from + (x - LOAD.from) * k} ${CARGO.floor + (y - CARGO.floor) * lift})`);
+        });
+        // porta de enrolar descendo de cima para baixo
+        const shut = smooth(LOAD_DOOR, LOAD_DOOR + LOAD.door, st.introT);
+        set(el.door, "transform", `translate(0 ${-CARGO.win.h * (1 - shut)})`);
+        if (dx < -40) {
+          st.depotOn = false;
+          set(el.depot, "display", "none");
+        }
+      }
+
       // ── cidades ao fundo: trechos urbanos (uma cidade a cada 10 s de viagem,
       // 25 s para cruzar) alternados com trechos de campo, sem cidade
       st.cityAcc += st.v * dt;
@@ -355,7 +408,17 @@ export function HeroRoad({ className = "" }: { className?: string }) {
       set(el.trailer, "transform", `translate(0 ${moving * Math.sin(st.s * 0.031 + 1) * 0.4}) rotate(${pitch * 0.3} 400 -20)`);
       const deg = mod(((st.s / RIG.wheelR) * 180) / Math.PI, 360);
       el.wheels.forEach((n) => set(n, "transform", `rotate(${deg})`));
-      set(el.brake, "fill", st.phase === "brake" || st.phase === "stopped" ? "#FF3B30" : "#7A1D1D");
+      set(el.brake, "fill", st.phase === "brake" || st.phase === "stopped" || st.phase === "loading" ? "#FF3B30" : "#7A1D1D");
+
+      // ── faróis: alto com a pista livre; baixa ao surgir carro na contramão
+      // (até ele passar pela cabine) e também parada, freando ou na doca
+      const cabX = tx + RIG.length;
+      const oncoming = st.cars.some((c) => c.on && c.x + 60 > cabX - 40);
+      const wantHigh = st.phase === "cruise" && !oncoming ? 1 : 0;
+      st.high += (wantHigh - st.high) * Math.min(1, dt * 7);
+      set(el.beamHigh, "opacity", st.high);
+      set(el.beamLow, "opacity", 1 - st.high * 0.6);
+      set(el.headGlow, "opacity", 0.35 + st.high * 0.65);
     };
 
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -387,7 +450,7 @@ export function HeroRoad({ className = "" }: { className?: string }) {
     };
   }, []);
 
-  const tx = baseX(width) + driftAmp(width);
+  const tx = introX(width);
   const layer = (l: StopLayer) => STOP_KINDS.map((k) => <Stop key={`${k}-${l}`} kind={k} layer={l} />);
 
   return (
@@ -406,6 +469,8 @@ export function HeroRoad({ className = "" }: { className?: string }) {
         {Array.from({ length: CARS }, (_, i) => (
           <Car key={i} slot={i} />
         ))}
+        {/* galpão antes da carreta: as caixas (na carreta) passam por cima da doca */}
+        <Depot />
         <g data-r="rig" transform={`translate(${tx} ${GROUND})`}>
           <Rig />
         </g>

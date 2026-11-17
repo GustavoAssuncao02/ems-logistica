@@ -55,6 +55,46 @@ export const CITY = {
    */
   gap: [3, 5],
 } as const;
+/**
+ * Abertura (ao entrar no site): carreta encostada na doca do centro de
+ * distribuição, caixas entrando no baú, porta fechando e partida.
+ */
+export const LOAD = {
+  boxes: 9,
+  /** Quando sai a primeira caixa e o intervalo entre caixas (s). */
+  first: 0.9,
+  every: 0.38,
+  /** Tempo de cada caixa da doca até o lugar na pilha. */
+  travel: 1.1,
+  /** Descida da porta de enrolar e pausa antes de arrancar. */
+  door: 1.0,
+  hold: 0.5,
+  /** Onde cada caixa sai, na doca (relativo à traseira do baú). */
+  from: -150,
+} as const;
+
+/**
+ * Compartimento de carga visível na traseira do baú (coordenadas locais da
+ * carreta): janela aberta onde as caixas são empilhadas em `cols` colunas,
+ * do fundo para a porta e de baixo para cima.
+ */
+export const CARGO = {
+  win: { x: 8, y: -153, w: 96, h: 99 },
+  /** Piso do baú = topo da plataforma da doca. */
+  floor: -54,
+  box: { w: 30, h: 28 },
+  cols: 3,
+} as const;
+
+/** Posição final (canto inferior esquerdo) da caixa `i` na pilha. */
+export const cargoSlot = (i: number): [number, number] => {
+  const row = Math.floor(i / CARGO.cols);
+  const col = CARGO.cols - 1 - (i % CARGO.cols);
+  return [CARGO.win.x + 1.5 + col * (CARGO.box.w + 1.5), CARGO.floor - row * CARGO.box.h];
+};
+/** Instante em que a porta começa a fechar e em que a carreta arranca. */
+export const LOAD_DOOR = LOAD.first + (LOAD.boxes - 1) * LOAD.every + LOAD.travel + 0.25;
+export const LOAD_GO = LOAD_DOOR + LOAD.door + LOAD.hold;
 /** Intervalo entre carros na contramão. */
 export const CAR_SECONDS = [4, 9] as const;
 
