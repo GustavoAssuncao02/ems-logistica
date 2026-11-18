@@ -302,6 +302,45 @@
   }
 }
 
+/* ------------------------------------------------------------------ */
+/* Cena "Visão de operação": trilho alto com palco fixo (sticky)        */
+/* enquanto a rolagem conduz a carreta pela estrada                     */
+/* ------------------------------------------------------------------ */
+.op-track {
+  --op-head: 4.5rem;
+  --op-stage: max(calc(100svh - var(--op-head)), 520px);
+  height: calc(var(--op-stage) + 95svh);
+}
+@media (min-width: 1024px) {
+  .op-track {
+    --op-head: 5rem;
+  }
+}
+.op-stage {
+  position: sticky;
+  top: var(--op-head);
+  height: var(--op-stage);
+}
+@media (prefers-reduced-motion: reduce) {
+  .op-track {
+    height: auto;
+  }
+  .op-stage {
+    position: relative;
+    top: 0;
+  }
+}
+
+/* Baú da abertura de Soluções: cabe inteiro na tela (proporção 4:5). */
+.trailer-size {
+  width: min(100%, 26rem, calc((100svh - 9rem) * 0.8));
+}
+@media (min-width: 1024px) {
+  .trailer-size {
+    width: min(100%, 36rem, calc((100svh - 8rem) * 0.8));
+  }
+}
+
 /* Estrada da hero: bordas laterais se dissolvem no fundo. */
 .road-ribbon {
   -webkit-mask-image: linear-gradient(to right, transparent, #000 1.5%, #000 95%, transparent);

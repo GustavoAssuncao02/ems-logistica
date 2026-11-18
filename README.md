@@ -86,6 +86,8 @@ src/
   components/
     brand/                  logo vetorial (monograma, assinatura, versão em string SVG)
     journey/                jornada 2D (ver abaixo)
+    scenes/                 cenas guiadas pela rolagem: estrada com a carreta 3D (three.js, carregado
+                            sob demanda) e o baú cuja porta abre nas Soluções
     sections/               seções da home e cabeçalhos de páginas internas
     layout/                 Header, Footer, WhatsAppFloat
     forms/                  QuoteForm, ContactForm, CareersForm e utilitários
