@@ -71,8 +71,7 @@ hero: {
 Mídia esperada: caminhão-baú **fotorealista** com a marca EMS na lateral, rodovia brasileira ao pôr do sol,
 enquadramento lateral-traseiro, vídeo curto sem áudio e em loop, com imagem de fallback.
 
-As imagens das soluções ficam em `src/components/sections/Solutions.tsx` (`image`), e a foto institucional em
-`About.tsx`. Use somente fotografias reais ou autorizadas, sem apresentar modelos de banco de imagens como equipe.
+As imagens das soluções ficam em `src/components/sections/Solutions.tsx` (`image`). Use somente fotografias reais ou autorizadas, sem apresentar modelos de banco de imagens como equipe.
 
 ---
 
@@ -87,7 +86,8 @@ src/
     brand/                  logo vetorial (monograma, assinatura, versão em string SVG)
     journey/                jornada 2D (ver abaixo)
     scenes/                 cenas guiadas pela rolagem: estrada com a carreta 3D (three.js, carregado
-                            sob demanda) e o baú cuja porta abre nas Soluções
+                            sob demanda), o baú cuja porta abre nas Soluções e a assinatura EMS que se
+                            monta em "A EMS" (a seta é desenhada primeiro, depois surgem as letras)
     sections/               seções da home e cabeçalhos de páginas internas
     layout/                 Header, Footer, WhatsAppFloat
     forms/                  QuoteForm, ContactForm, CareersForm e utilitários
@@ -151,7 +151,7 @@ Depuração: `/?jt=12.5` posiciona a animação no segundo 12,5 (pausada).
 ## Pendências e itens a validar com a EMS
 
 - [ ] **Hero:** vídeo/foto fotorealista do caminhão com a marca EMS (hoje há uma composição provisória identificada).
-- [ ] **Fotografias** das soluções e da seção "A EMS" (hoje com selos "Fotografia pendente").
+- [ ] **Fotografias** das soluções (hoje com selos "Fotografia pendente").
 - [ ] **WhatsApp comercial, e-mail e endereço** oficiais.
 - [ ] **Instagram:** preencher `contact.instagram` com o perfil próprio da EMS Logística (não usar o da EMS Consultoria, que é outra empresa). Enquanto vazio, os links ficam ocultos.
 - [ ] **Assinatura da marca:** a logo é uma reconstrução vetorial do monograma EMS com o descritor "LOGÍSTICA". Validar com a versão oficial.

@@ -1,5 +1,4 @@
-import { EmsLogo } from "@/components/brand/EmsLogo";
-import { MediaSlot } from "@/components/ui/MediaSlot";
+import { BrandReveal } from "@/components/scenes/BrandReveal";
 import { Reveal } from "@/components/ui/Reveal";
 import { site } from "@/config/site";
 
@@ -13,16 +12,9 @@ export function About() {
   return (
     <section id="sobre" aria-labelledby="sobre-title" className="bg-mist">
       <div className="container-ems grid gap-14 py-24 md:py-32 lg:grid-cols-12 lg:items-center lg:gap-20">
-        <Reveal className="lg:col-span-5">
-          <MediaSlot
-            alt="Fotografia institucional da EMS Logística"
-            brief="foto real da equipe ou do escritório da EMS"
-            className="aspect-[4/5] rounded-[1.75rem]"
-            tone="navy"
-          >
-            <EmsLogo variant="inverse" className="w-3/5 max-w-[15rem] opacity-90" />
-          </MediaSlot>
-        </Reveal>
+        <div className="lg:col-span-5">
+          <BrandReveal className="aspect-[4/5] rounded-[1.75rem] shadow-[0_30px_60px_-36px_rgba(11,26,56,0.7)] sm:aspect-[5/4] lg:aspect-[4/5]" />
+        </div>
 
         <div className="lg:col-span-7">
           <Reveal>
