@@ -2,8 +2,8 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { CornerSwoosh } from "@/components/scenes/CornerSwoosh";
 import { TrailerScene } from "@/components/scenes/TrailerScene";
+import { TransportScene } from "@/components/scenes/TransportScene";
 import { Arrow } from "@/components/ui/ButtonLink";
-import { MediaSlot } from "@/components/ui/MediaSlot";
 import { PhotoFrame } from "@/components/ui/PhotoFrame";
 import { Reveal } from "@/components/ui/Reveal";
 import {
@@ -43,16 +43,17 @@ const freight = {
 const transport = {
   n: "03",
   label: "Transporte rodoviário de cargas",
-  title: "Conectando operações aos seus destinos.",
   text: "Soluções em transporte rodoviário de cargas estruturadas a partir das características de cada operação: origem e destino, tipo de carga, volume e frequência.",
-  points: ["Origem e destino", "Tipo e volume de carga", "Frequência da operação"],
-  image: null as string | null,
-  brief: "caminhão-baú em rodovia brasileira",
+  points: [
+    { label: ["Origem e", "destino"], Icon: PinIcon },
+    { label: ["Tipo e volume", "de carga"], Icon: PackageIcon },
+    { label: ["Frequência", "da operação"], Icon: CalendarIcon },
+  ],
 };
 
 export function Solutions() {
   return (
-    <section id="solucoes" aria-labelledby="solucoes-title" className="bg-mist">
+    <section id="solucoes" aria-labelledby="solucoes-title" className="overflow-x-clip bg-mist">
       <SolutionsOpening />
       <div className="container-ems pb-24 md:pb-32">
         <div className="divide-y divide-line">
@@ -357,37 +358,46 @@ function FreightOverlay() {
 function TransportFeature() {
   const item = transport;
   return (
-    <article className="grid items-center gap-10 py-16 md:py-24 lg:grid-cols-12 lg:gap-16" aria-labelledby={`sol-${item.n}`}>
+    <article className="relative isolate grid items-center gap-10 py-16 md:py-24 lg:grid-cols-12 lg:gap-14" aria-labelledby={`sol-${item.n}`}>
+      {/* faixa de canto e onda suave, como nas cenas anteriores */}
+      <CornerSwoosh corner="tl" className="pointer-events-none absolute left-[calc(50%-50vw)] top-0 -z-10 h-14 sm:h-20 lg:h-24" />
+      <svg
+        className="pointer-events-none absolute bottom-0 right-[calc(50%-50vw)] -z-10 h-[70%] w-[60vw] [mask-image:linear-gradient(to_bottom,#000_55%,transparent)]"
+        viewBox="0 0 800 400"
+        preserveAspectRatio="none"
+        aria-hidden="true"
+        focusable="false"
+      >
+        <path d="M800 40C640 170 420 300 0 400H800Z" fill="#ffffff" opacity="0.7" />
+        <path d="M800 170C690 250 560 330 330 400H800Z" fill="#e6ecf6" opacity="0.6" />
+      </svg>
+
       <Reveal className="lg:col-span-6">
-        <MediaSlot
-          src={item.image}
-          alt={`Fotografia ilustrativa — ${item.label}`}
-          brief={item.brief}
-          className="aspect-[4/3] rounded-[1.75rem] shadow-[0_30px_60px_-40px_rgba(22,47,96,0.6)] lg:aspect-[5/4]"
-          tone="navy"
-        >
-          <span className="font-display text-[9rem] font-extrabold leading-none tracking-tighter text-white/[0.08] sm:text-[12rem]" aria-hidden="true">
-            {item.n}
-          </span>
-        </MediaSlot>
+        <TransportScene className={`rounded-[1.75rem] ${photoShadow}`} />
       </Reveal>
-      <Reveal delay={120} className="lg:col-span-6 lg:pl-6">
+
+      <Reveal delay={120} className="lg:col-span-6">
         <Kicker n={item.n} label={item.label} />
-        <h3 id={`sol-${item.n}`} className="mt-6 text-3xl font-extrabold leading-[1.12] sm:text-[2.6rem]">
-          {item.title}
+        <h3 id={`sol-${item.n}`} className="mt-5 text-3xl font-extrabold leading-[1.1] sm:text-[2.6rem]">
+          Conectando operações aos seus destinos<span className="text-orange">.</span>
         </h3>
-        <p className="mt-6 text-lg leading-relaxed text-slate">{item.text}</p>
-        <ul className="mt-8 flex flex-wrap gap-2.5">
-          {item.points.map((p) => (
-            <li key={p} className="rounded-full bg-white px-4 py-2 text-sm font-medium text-navy ring-1 ring-line">
-              {p}
+        <p className="mt-5 text-lg leading-relaxed text-[#4b5872]">{item.text}</p>
+        <ul className="mt-8 flex flex-wrap gap-x-5 gap-y-3">
+          {item.points.map(({ label, Icon }) => (
+            <li
+              key={label[0]}
+              className="relative flex items-center gap-2.5 rounded-[1.4rem] bg-white py-3 pl-3.5 pr-4 shadow-[0_14px_30px_-20px_rgba(22,47,96,0.45)] ring-1 ring-line/70 xl:not-first:before:absolute xl:not-first:before:-left-[0.65rem] xl:not-first:before:top-1/2 xl:not-first:before:h-10 xl:not-first:before:w-px xl:not-first:before:-translate-y-1/2 xl:not-first:before:bg-navy/15"
+            >
+              <Icon className="h-7 w-7 shrink-0 text-orange" />
+              <span className="font-display text-sm font-bold leading-tight text-navy">
+                {label[0]}
+                <br />
+                {label[1]}
+              </span>
             </li>
           ))}
         </ul>
-        <Link href="/#cotacao" className="group mt-10 inline-flex items-center gap-2 font-semibold text-navy">
-          <span className="border-b border-orange pb-0.5">Solicitar cotação</span>
-          <Arrow />
-        </Link>
+        <QuoteLink />
       </Reveal>
     </article>
   );

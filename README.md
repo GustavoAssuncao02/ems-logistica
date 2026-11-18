@@ -87,7 +87,9 @@ src/
     journey/                jornada 2D (ver abaixo)
     scenes/                 cenas guiadas pela rolagem: estrada com a carreta 3D (three.js, carregado
                             sob demanda), o baú cuja porta abre nas Soluções e a assinatura EMS que se
-                            monta em "A EMS" (a seta é desenhada primeiro, depois surgem as letras)
+                            monta em "A EMS" (a seta é desenhada primeiro, depois surgem as letras);
+                            no item 03, mapa do Brasil (malha do IBGE) sobre céu com nuvens
+                            volumétricas renderizadas ao vivo em WebGL2 (cloudSky.ts)
     sections/               seções da home e cabeçalhos de páginas internas
     layout/                 Header, Footer, WhatsAppFloat
     forms/                  QuoteForm, ContactForm, CareersForm e utilitários
