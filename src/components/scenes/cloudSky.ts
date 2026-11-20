@@ -151,10 +151,10 @@ vec3 skyAbove(vec3 rd) {
 // Abaixo do horizonte: o mar de nuvens distante se perde na névoa; perto,
 // as frestas mostram o chão escuro lá embaixo.
 vec3 skyColor(vec3 rd) {
+  if (rd.y >= 0.0) return skyAbove(rd);
   vec3 haze = skyAbove(normalize(vec3(rd.x, 0.012, rd.z)));
   float s = max(dot(rd, SUN), 0.0);
   vec3 ground = vec3(0.010, 0.008, 0.020) + vec3(0.12, 0.035, 0.02) * pow(s, 6.0);
-  if (rd.y >= 0.0) return skyAbove(rd);
   return mix(haze, ground, smoothstep(0.0, 0.16, -rd.y));
 }
 
@@ -171,6 +171,8 @@ float towerTop(vec3 p, float weather, float variation) {
 }
 
 float density(vec3 p, bool detailed, float foot) {
+  // Antes das torres, a variação só eleva o topo do mar em até 0,175.
+  if (p.y <= SEA_BOT || (p.z <= TOWER_Z && p.y >= SEA_TOP + 0.175)) return 0.0;
   vec3 w = ROT * p;
   float weather = textureLod(uNoise, w * 0.03 + WIND * uTime * 0.25 + 0.37, lod(foot, 0.03)).b;
   float variation = textureLod(uNoise, w * 0.11 + WIND * uTime * 0.5 + 0.71, lod(foot, 0.11)).b;

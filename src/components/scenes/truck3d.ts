@@ -34,9 +34,11 @@ export const lengthFactor = (a: number) => {
 type Three = typeof import("three");
 
 export async function createTruckView(canvas: HTMLCanvasElement, pixels: number): Promise<TruckView> {
-  const THREE = await import("three");
-  const { RoundedBoxGeometry } = await import("three/addons/geometries/RoundedBoxGeometry.js");
-  const { RoomEnvironment } = await import("three/addons/environments/RoomEnvironment.js");
+  const [THREE, { RoundedBoxGeometry }, { RoomEnvironment }] = await Promise.all([
+    import("three"),
+    import("three/addons/geometries/RoundedBoxGeometry.js"),
+    import("three/addons/environments/RoomEnvironment.js"),
+  ]);
 
   const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true, premultipliedAlpha: true, powerPreference: "low-power" });
   renderer.setPixelRatio(1);
@@ -85,15 +87,23 @@ export async function createTruckView(canvas: HTMLCanvasElement, pixels: number)
   const rig = await buildRig(THREE, RoundedBoxGeometry, anisotropy);
   scene.add(rig);
 
+  let lastAngle: number | undefined;
+  const invalidate = () => { lastAngle = undefined; };
+  canvas.addEventListener("webglcontextrestored", invalidate);
   return {
     render(screenAngleDeg) {
+      if (screenAngleDeg === lastAngle) return;
       rig.rotation.y = -yawForScreenAngle((screenAngleDeg * Math.PI) / 180);
       renderer.render(scene, camera);
+      lastAngle = screenAngleDeg;
     },
     resize(px) {
+      if (canvas.width === px && canvas.height === px) return;
       renderer.setSize(px, px, false);
+      invalidate();
     },
     dispose() {
+      canvas.removeEventListener("webglcontextrestored", invalidate);
       scene.traverse((o) => {
         const m = o as import("three").Mesh;
         if (!m.isMesh) return;

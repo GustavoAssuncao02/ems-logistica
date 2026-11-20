@@ -46,14 +46,22 @@ function ridge(tile: number, y0: number, harmonics: [number, number, number][], 
 
 const copiesFor = (width: number, tile: number) => Math.ceil(width / tile) + 1;
 
+function TileCopies({ id, tile, copies, children }: { id: LayerId; tile: number; copies: number; children: ReactNode }) {
+  const tileId = `hr-tile-${id}`;
+  return (
+    <>
+      <g id={tileId}>{children}</g>
+      {Array.from({ length: copies - 1 }, (_, i) => (
+        <use key={i} href={`#${tileId}`} x={(i + 1) * tile} />
+      ))}
+    </>
+  );
+}
+
 function Tiled({ id, tile, width, children }: { id: LayerId; tile: number; width: number; children: ReactNode }) {
   return (
     <g data-r={`layer-${id}`}>
-      {Array.from({ length: copiesFor(width, tile) }, (_, i) => (
-        <g key={i} transform={`translate(${i * tile} 0)`}>
-          {children}
-        </g>
-      ))}
+      <TileCopies id={id} tile={tile} copies={copiesFor(width, tile)}>{children}</TileCopies>
     </g>
   );
 }
@@ -89,11 +97,7 @@ function TiledPlane({ id, tile, width, scale, children }: { id: LayerId; tile: n
   const copies = copiesFor(width, tile);
   return (
     <Plane id={`layer-${id}`} units={copies * tile} scale={scale} moving>
-      {Array.from({ length: copies }, (_, i) => (
-        <g key={i} transform={`translate(${i * tile} 0)`}>
-          {children}
-        </g>
-      ))}
+      <TileCopies id={id} tile={tile} copies={copies}>{children}</TileCopies>
     </Plane>
   );
 }

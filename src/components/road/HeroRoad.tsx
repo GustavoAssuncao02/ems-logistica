@@ -306,6 +306,7 @@ export function HeroRoad({ className = "" }: { className?: string }) {
           }
           break;
       }
+      const previousDistance = st.s;
       st.s += st.v * dt;
       if (dt > 0) st.a += ((st.v - vPrev) / dt - st.a) * Math.min(1, dt * 5);
 
@@ -425,10 +426,12 @@ export function HeroRoad({ className = "" }: { className?: string }) {
       });
 
       // ── cenário em parallax
-      for (const l of el.layers) {
-        const dx = -mod(st.s * l.f, l.tile);
-        if (l.css) css(l.node, "transform", shift(dx));
-        else set(l.node, "transform", `translate(${dx} 0)`);
+      if (previousDistance !== st.s || dt === 0) {
+        for (const l of el.layers) {
+          const dx = -mod(st.s * l.f, l.tile);
+          if (l.css) css(l.node, "transform", shift(dx));
+          else set(l.node, "transform", `translate(${dx} 0)`);
+        }
       }
 
       // ── carreta
@@ -453,8 +456,6 @@ export function HeroRoad({ className = "" }: { className?: string }) {
     };
 
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    // celular/tablet (toque): 30 qps bastam e poupam bateria e CPU
-    const minFrame = window.matchMedia("(pointer: coarse)").matches ? 1000 / 30 - 2 : 0;
     step(0);
     redrawRef.current = () => step(0);
     stage.style.opacity = "1";
@@ -464,10 +465,6 @@ export function HeroRoad({ className = "" }: { className?: string }) {
     let last = 0;
     let visible = false;
     const loop = (now: number) => {
-      if (last && now - last < minFrame) {
-        raf = requestAnimationFrame(loop);
-        return;
-      }
       const dt = last ? Math.min(0.05, (now - last) / 1000) : 0;
       last = now;
       step(dt);

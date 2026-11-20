@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { HeroRoad } from "@/components/road/HeroRoad";
 import { ButtonLink } from "@/components/ui/ButtonLink";
-import { publicAsset, site } from "@/config/site";
+import { pagesBuild, publicAsset, site } from "@/config/site";
 
 /**
  * Hero cinematográfica.
@@ -37,6 +37,11 @@ export function Hero() {
             {video.webm && <source src={publicAsset(video.webm)} type="video/webm" />}
             <source src={publicAsset(video.mp4)} type="video/mp4" />
           </video>
+        ) : image && pagesBuild ? (
+          <picture>
+            {image.portraitSrc && <source media="(max-aspect-ratio: 13/20)" srcSet={publicAsset(image.portraitSrc)} />}
+            <img src={publicAsset(image.src)} alt={image.alt} fetchPriority="high" className="absolute inset-0 h-full w-full object-cover object-[70%_center]" />
+          </picture>
         ) : image ? (
           <Image src={publicAsset(image.src)} alt={image.alt} fill priority sizes="100vw" className="object-cover object-[70%_center]" />
         ) : (

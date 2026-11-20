@@ -131,12 +131,21 @@ export function RoadScene({ children }: { children: ReactNode }) {
     };
     // (Safari antigo não tem requestIdleCallback)
     const hasIdle = typeof window.requestIdleCallback === "function";
-    const idle = hasIdle ? window.requestIdleCallback(start, { timeout: 1200 }) : window.setTimeout(start, 200);
+    let idle: number | undefined;
+    const near = new IntersectionObserver(([entry]) => {
+      if (!entry.isIntersecting) return;
+      near.disconnect();
+      idle = hasIdle ? window.requestIdleCallback(start, { timeout: 500 }) : window.setTimeout(start, 0);
+    }, { rootMargin: "150% 0px" });
+    near.observe(track);
 
     return () => {
       disposed = true;
-      if (hasIdle) window.cancelIdleCallback(idle);
-      else window.clearTimeout(idle);
+      near.disconnect();
+      if (idle !== undefined) {
+        if (hasIdle) window.cancelIdleCallback(idle);
+        else window.clearTimeout(idle);
+      }
       unbind();
       view?.dispose();
       view = null;

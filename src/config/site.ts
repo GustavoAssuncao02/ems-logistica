@@ -57,9 +57,10 @@ export const site = {
   hero: {
     video: null as null | { mp4: string; webm?: string; poster: string },
     image: {
-      src: "/media/caminhao-ems-por-do-sol-direita-v2.png",
+      src: "/media/caminhao-ems-por-do-sol-direita-v2.webp",
+      portraitSrc: "/media/caminhao-ems-retrato.webp",
       alt: "Caminhão EMS na rodovia ao pôr do sol, com montanhas e uma cidade ao fundo.",
-    } as null | { src: string; alt: string },
+    } as null | { src: string; portraitSrc?: string; alt: string },
   },
 
   /** Exibe selos "Mídia pendente" nos espaços que aguardam fotografia oficial. */
