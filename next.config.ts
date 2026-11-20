@@ -1,6 +1,8 @@
 import path from "node:path";
 import type { NextConfig } from "next";
 
+const pagesBuild = process.env.NEXT_PUBLIC_GITHUB_PAGES === "true";
+
 const securityHeaders = [
   { key: "X-Content-Type-Options", value: "nosniff" },
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
@@ -13,12 +15,18 @@ const nextConfig: NextConfig = {
   turbopack: { root: path.join(__dirname) },
   poweredByHeader: false,
   reactStrictMode: true,
+  pageExtensions: pagesBuild ? ["tsx", "ts", "jsx", "js"] : ["server.ts", "tsx", "ts", "jsx", "js"],
   images: {
     formats: ["image/avif", "image/webp"],
+    unoptimized: pagesBuild,
   },
-  async headers() {
-    return [{ source: "/:path*", headers: securityHeaders }];
-  },
+  ...(pagesBuild
+    ? { output: "export", basePath: process.env.NEXT_PUBLIC_BASE_PATH, trailingSlash: true }
+    : {
+        async headers() {
+          return [{ source: "/:path*", headers: securityHeaders }];
+        },
+      }),
 };
 
 export default nextConfig;

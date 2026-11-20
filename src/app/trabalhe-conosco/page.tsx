@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { CareersForm } from "@/components/forms/CareersForm";
+import { FormUnavailable } from "@/components/forms/FormUnavailable";
 import { PageIntro } from "@/components/sections/PageIntro";
+import { pagesBuild } from "@/config/site";
 
 export const metadata: Metadata = {
   title: "Trabalhe conosco",
@@ -18,7 +20,7 @@ export default function TrabalheConoscoPage() {
   return (
     <main id="conteudo">
       <PageIntro eyebrow="Trabalhe conosco" title="Seu próximo caminho pode começar aqui.">
-        <p>Quer construir sua trajetória em logística e gestão? Envie seu currículo para a EMS Logística.</p>
+        <p>Quer construir sua trajetória em logística e gestão?{!pagesBuild && " Envie seu currículo para a EMS Logística."}</p>
       </PageIntro>
       <section className="bg-white" aria-label="Envio de currículo">
         <div className="container-ems grid gap-12 py-16 md:py-24 lg:grid-cols-12 lg:gap-16">
@@ -35,7 +37,7 @@ export default function TrabalheConoscoPage() {
           </aside>
           <div className="lg:col-span-8">
             <div className="rounded-[1.75rem] bg-white p-6 ring-1 ring-line sm:p-10 lg:shadow-[0_30px_80px_-50px_rgba(22,47,96,0.45)]">
-              <CareersForm />
+              {pagesBuild ? <FormUnavailable /> : <CareersForm />}
             </div>
           </div>
         </div>

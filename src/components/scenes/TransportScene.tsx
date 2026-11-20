@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { CalendarIcon, PackageIcon, PinIcon } from "@/components/sections/solutionIcons";
+import { publicAsset } from "@/config/site";
 import { BR_BORDERS, BR_CAPITALS, BR_OUTLINE, BR_VIEW, brPoint } from "./brazilMap";
 import type { CloudSky } from "./cloudSky";
 
@@ -176,7 +177,7 @@ export function TransportScene({ className = "" }: { className?: string }) {
       className={`@container relative isolate aspect-[10/7] overflow-hidden bg-[#0d2149] ${className}`}
     >
       {/* céu: quadro estático enquanto o WebGL não assume (e sem WebGL2) */}
-      <Image src="/media/transporte-ceu.webp" alt="" fill sizes="(min-width: 1024px) 50vw, 100vw" className="object-cover" />
+      <Image src={publicAsset("/media/transporte-ceu.webp")} alt="" fill sizes="(min-width: 1024px) 50vw, 100vw" className="object-cover" />
       <canvas
         ref={canvas}
         aria-hidden="true"
@@ -305,7 +306,7 @@ export function TransportScene({ className = "" }: { className?: string }) {
         style={{ left: pct(BOXES.x, BR_VIEW.w), top: pct(BOXES.y, BR_VIEW.h), width: pct(BOXES.w, BR_VIEW.w), height: pct(BOXES.h, BR_VIEW.h) }}
       >
         <span className="absolute inset-x-[4%] bottom-[-3%] h-[10%] rounded-[50%] bg-black/60 blur-md" />
-        <Image src="/media/transporte-caixas.webp" alt="" fill sizes="(min-width: 1024px) 24vw, 45vw" className="object-contain" />
+        <Image src={publicAsset("/media/transporte-caixas.webp")} alt="" fill sizes="(min-width: 1024px) 24vw, 45vw" className="object-contain" />
       </div>
 
       {/* painel de vidro (repete os pontos da lista ao lado; decorativo) */}

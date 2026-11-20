@@ -1,7 +1,8 @@
 import { InstagramIcon } from "@/components/layout/Footer";
 import { QuoteForm } from "@/components/forms/QuoteForm";
+import { FormUnavailable } from "@/components/forms/FormUnavailable";
 import { Reveal } from "@/components/ui/Reveal";
-import { site, whatsappLink } from "@/config/site";
+import { pagesBuild, site, whatsappLink } from "@/config/site";
 
 /** Seção de cotação (#cotacao) — usada na home e em /cotacao. */
 export function QuoteSection({ headingLevel = "h2" }: { headingLevel?: "h1" | "h2" }) {
@@ -19,7 +20,7 @@ export function QuoteSection({ headingLevel = "h2" }: { headingLevel?: "h1" | "h
             <p className="mt-6 text-lg leading-relaxed text-slate">
               Conte como funciona a sua operação. A equipe da EMS Logística analisa as informações e retorna com uma proposta de caminho.
             </p>
-            <ul className="mt-10 space-y-4 text-[15px] text-navy">
+            {!pagesBuild && <ul className="mt-10 space-y-4 text-[15px] text-navy">
               {[
                 "Os campos de rota e carga aparecem conforme o serviço escolhido.",
                 "Não calculamos preços automaticamente: cada operação é analisada.",
@@ -30,7 +31,7 @@ export function QuoteSection({ headingLevel = "h2" }: { headingLevel?: "h1" | "h
                   <span>{t}</span>
                 </li>
               ))}
-            </ul>
+            </ul>}
             <div className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-3 text-sm">
               {wa && (
                 <a href={wa} target="_blank" rel="noopener noreferrer" className="font-semibold text-navy underline-offset-4 hover:underline">
@@ -54,7 +55,7 @@ export function QuoteSection({ headingLevel = "h2" }: { headingLevel?: "h1" | "h
 
         <Reveal delay={120} className="lg:col-span-7">
           <div className="rounded-[1.75rem] bg-white p-6 shadow-[0_30px_80px_-50px_rgba(22,47,96,0.55)] ring-1 ring-line sm:p-10">
-            <QuoteForm />
+            {pagesBuild ? <FormUnavailable /> : <QuoteForm />}
           </div>
         </Reveal>
       </div>

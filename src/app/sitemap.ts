@@ -1,5 +1,7 @@
 import type { MetadataRoute } from "next";
-import { site } from "@/config/site";
+import { pagesBuild, site } from "@/config/site";
+
+export const dynamic = "force-static";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const routes: { path: string; priority: number }[] = [
@@ -9,9 +11,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/trabalhe-conosco", priority: 0.6 },
     { path: "/politica-de-privacidade", priority: 0.3 },
   ];
-  return routes.map((r) => ({
-    url: `${site.url}${r.path === "/" ? "" : r.path}`,
-    changeFrequency: "monthly",
-    priority: r.priority,
-  }));
+  return routes.map(({ path, priority }) => {
+    const pathname = path === "/" ? "" : path;
+    return {
+      url: `${site.url}${pathname}${pagesBuild ? "/" : ""}`,
+      changeFrequency: "monthly",
+      priority,
+    };
+  });
 }

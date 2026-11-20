@@ -2,6 +2,8 @@ import { ImageResponse } from "next/og";
 import { monogramSvg, svgDataUri } from "@/components/brand/monogramSvg";
 import { site } from "@/config/site";
 
+export const dynamic = "force-static";
+
 export const alt = `${site.name} — Do planejamento à estrada. Logística que conecta negócios.`;
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";

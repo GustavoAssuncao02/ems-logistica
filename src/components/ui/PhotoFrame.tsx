@@ -1,6 +1,6 @@
 import Image from "next/image";
 import type { ReactNode } from "react";
-import { site } from "@/config/site";
+import { publicAsset, site } from "@/config/site";
 
 type Props = {
   /** Caminho em /public. Sem foto, mostra um céu de fim de tarde provisório. */
@@ -25,7 +25,7 @@ export function PhotoFrame({ src, alt, brief, className = "", sizes = "(min-widt
       className={`relative isolate overflow-hidden bg-navy-900 ${className}`}
       {...(src ? {} : { role: "img", "aria-label": `${alt} (fotografia ainda não fornecida)` })}
     >
-      {src ? <Image src={src} alt={alt} fill sizes={sizes} className="-z-10 object-cover" /> : <SunsetPlaceholder />}
+      {src ? <Image src={publicAsset(src)} alt={alt} fill sizes={sizes} className="-z-10 object-cover" /> : <SunsetPlaceholder />}
       {children}
       {!src && site.showPendingMediaBadges && (
         <span className="absolute bottom-3 left-3 max-w-[85%] rounded-full bg-black/35 px-3 py-1 text-[11px] font-medium text-white/85 ring-1 ring-white/20 backdrop-blur-sm">

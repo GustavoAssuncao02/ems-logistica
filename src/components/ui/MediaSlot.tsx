@@ -1,6 +1,6 @@
 import Image from "next/image";
 import type { ReactNode } from "react";
-import { site } from "@/config/site";
+import { publicAsset, site } from "@/config/site";
 
 type Props = {
   /** Caminho em /public. Quando ausente, mostra a composição provisória. */
@@ -23,7 +23,7 @@ export function MediaSlot({ src, alt, brief, className = "", sizes = "(min-width
   if (src) {
     return (
       <div className={`relative overflow-hidden ${className}`}>
-        <Image src={src} alt={alt} fill sizes={sizes} className="object-cover" />
+        <Image src={publicAsset(src)} alt={alt} fill sizes={sizes} className="object-cover" />
       </div>
     );
   }

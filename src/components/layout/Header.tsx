@@ -97,7 +97,7 @@ export function Header() {
                   href={item.href}
                   className={`relative py-2 text-[14px] font-medium transition after:absolute after:inset-x-0 after:-bottom-0.5 after:h-px after:origin-left after:scale-x-0 after:bg-orange after:transition-transform after:duration-300 hover:after:scale-x-100 ${
                     overlay ? "text-white/85 hover:text-white" : "text-navy/75 hover:text-navy"
-                  } ${pathname === item.href ? (overlay ? "text-white" : "text-navy") : ""}`}
+                  } ${pathname.replace(/\/$/, "") === item.href ? (overlay ? "text-white" : "text-navy") : ""}`}
                 >
                   {item.label}
                 </Link>

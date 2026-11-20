@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ContactForm } from "@/components/forms/ContactForm";
+import { FormUnavailable } from "@/components/forms/FormUnavailable";
 import { InstagramIcon } from "@/components/layout/Footer";
 import { PageIntro } from "@/components/sections/PageIntro";
-import { site, whatsappLink } from "@/config/site";
+import { pagesBuild, site, whatsappLink } from "@/config/site";
 
 export const metadata: Metadata = {
   title: "Contato",
@@ -17,7 +18,7 @@ export default function ContatoPage() {
   return (
     <main id="conteudo">
       <PageIntro eyebrow="Contato" title="Vamos conversar sobre a sua operação.">
-        <p>Envie sua mensagem pelo formulário ou fale com a EMS pelos canais oficiais.</p>
+        <p>{pagesBuild ? "Conheça os canais de contato da EMS Logística." : "Envie sua mensagem pelo formulário ou fale com a EMS pelos canais oficiais."}</p>
       </PageIntro>
       <section className="bg-white" aria-label="Canais de contato">
         <div className="container-ems grid gap-12 py-16 md:py-24 lg:grid-cols-12 lg:gap-16">
@@ -60,7 +61,7 @@ export default function ContatoPage() {
           </aside>
           <div className="lg:col-span-8">
             <div className="rounded-[1.75rem] bg-white p-6 ring-1 ring-line sm:p-10 lg:shadow-[0_30px_80px_-50px_rgba(22,47,96,0.45)]">
-              <ContactForm />
+              {pagesBuild ? <FormUnavailable /> : <ContactForm />}
             </div>
           </div>
         </div>

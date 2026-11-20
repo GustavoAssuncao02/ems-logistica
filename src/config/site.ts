@@ -7,6 +7,13 @@
  * nunca um dado fictício.
  */
 
+export const pagesBuild = process.env.NEXT_PUBLIC_GITHUB_PAGES === "true";
+
+export function publicAsset(url: string) {
+  const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+  return pagesBuild && url.startsWith("/") && !url.startsWith("//") ? `${basePath}${url}` : url;
+}
+
 export const site = {
   name: "EMS Logística",
   shortName: "EMS",

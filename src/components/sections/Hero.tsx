@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { HeroRoad } from "@/components/road/HeroRoad";
 import { ButtonLink } from "@/components/ui/ButtonLink";
-import { site } from "@/config/site";
+import { publicAsset, site } from "@/config/site";
 
 /**
  * Hero cinematográfica.
@@ -31,14 +31,14 @@ export function Hero() {
             loop
             playsInline
             preload="metadata"
-            poster={video.poster}
+            poster={publicAsset(video.poster)}
             aria-hidden="true"
           >
-            {video.webm && <source src={video.webm} type="video/webm" />}
-            <source src={video.mp4} type="video/mp4" />
+            {video.webm && <source src={publicAsset(video.webm)} type="video/webm" />}
+            <source src={publicAsset(video.mp4)} type="video/mp4" />
           </video>
         ) : image ? (
-          <Image src={image.src} alt={image.alt} fill priority sizes="100vw" className="object-cover object-[70%_center]" />
+          <Image src={publicAsset(image.src)} alt={image.alt} fill priority sizes="100vw" className="object-cover object-[70%_center]" />
         ) : (
           <HeroPlaceholder />
         )}
