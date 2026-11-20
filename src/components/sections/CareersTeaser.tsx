@@ -1,32 +1,37 @@
-import { ButtonLink } from "@/components/ui/ButtonLink";
-import { Reveal } from "@/components/ui/Reveal";
+﻿import Link from "next/link";
+import { Arrow } from "@/components/ui/ButtonLink";
+import { publicAsset } from "@/config/site";
 
 export function CareersTeaser() {
   return (
-    <section aria-labelledby="carreiras-title" className="bg-white">
-      <div className="container-ems py-20 md:py-28">
-        <Reveal className="relative overflow-hidden rounded-[2rem] bg-navy px-7 py-14 text-white sm:px-12 md:px-16 md:py-20">
-          <svg aria-hidden="true" className="absolute -right-10 bottom-0 h-full w-2/3 opacity-60" viewBox="0 0 600 300" preserveAspectRatio="xMaxYMax meet">
-            <path d="M0 290 C 160 280, 240 200, 330 190 S 520 120, 600 20" fill="none" stroke="#F47C28" strokeWidth="2" strokeDasharray="2 10" strokeLinecap="round" />
-            <circle cx="600" cy="20" r="6" fill="#F47C28" />
-          </svg>
-          <div className="relative grid gap-10 md:grid-cols-[1.4fr_1fr] md:items-end">
-            <div>
-              <p className="eyebrow text-orange">Trabalhe conosco</p>
-              <h2 id="carreiras-title" className="mt-5 text-4xl font-extrabold leading-[1.08] text-white sm:text-5xl">
-                Seu próximo caminho pode começar aqui.
-              </h2>
-              <p className="mt-6 max-w-xl text-lg leading-relaxed text-white/70">
-                Envie seu currículo para a EMS Logística. Os perfis recebidos são avaliados conforme as necessidades da empresa.
-              </p>
-            </div>
-            <div className="md:justify-self-end">
-              <ButtonLink href="/trabalhe-conosco" arrow>
-                Enviar currículo
-              </ButtonLink>
-            </div>
-          </div>
-        </Reveal>
+    <section id="carreiras" aria-labelledby="carreiras-title" className="relative scroll-mt-20 bg-[#282521] text-white">
+      <div className="relative aspect-[1150/771] overflow-hidden lg:aspect-[2039/771]">
+        <img
+          src={publicAsset("/media/trabalhe-conosco-escritorio.webp")}
+          width={2039}
+          height={771}
+          loading="lazy"
+          alt=""
+          className="absolute right-0 top-0 h-full w-auto max-w-none"
+        />
+      </div>
+      <div className="px-6 py-8 sm:px-10 lg:p-0">
+        <div className="lg:sr-only">
+          <p className="eyebrow flex items-center gap-3"><span aria-hidden="true" className="h-1 w-7 bg-orange" />Trabalhe conosco</p>
+          <h2 id="carreiras-title" className="mt-4 max-w-xl text-4xl font-extrabold leading-tight">
+            Seu próximo caminho pode começar <span className="text-orange">aqui.</span>
+          </h2>
+          <p className="mt-4 max-w-xl leading-relaxed">
+            Envie seu currículo para a EMS Logística. Os perfis recebidos são avaliados conforme as necessidades da empresa.
+          </p>
+        </div>
+        <Link
+          href="/trabalhe-conosco"
+          className="group mt-6 inline-flex items-center justify-center gap-3 rounded-full bg-[#ff8300] px-6 py-3 font-bold text-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white lg:absolute lg:left-[6.08%] lg:top-[63.68%] lg:mt-0 lg:h-[10.25%] lg:w-[16.4%] lg:bg-transparent lg:p-0"
+        >
+          <span className="lg:sr-only">Enviar currículo</span>
+          <Arrow className="lg:hidden" />
+        </Link>
       </div>
     </section>
   );
